@@ -1,6 +1,6 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
+ >> Project:    TA_Algoritmos_Avanzados_G7
  >> File:       resolucion.h
  >> Author:     Grupo 7
 [/] */
@@ -14,15 +14,31 @@
 
 void GVNS(struct Problema &);
 
-void inicializarSolucion(const vector<struct DatosVehiculo>& datosVehiculos, struct Solucion& solucionActual);
+void inicializarSolucion(const vector<struct Vehiculo> &, struct Solucion &);
 
-void solucionInicial(struct Problema &problemita, struct Solucion& solucionActual);
+void solucionInicial1(struct Problema &problemita, struct Solucion& solucionActual);
 
-int masCercanoNodo(vector<vector<double>> &distancias, vector<struct Cliente> &copiaClientes, int partida);
+void llenarFitnessYMas(struct Problema &problemita, struct Solucion& solucionActual);
 
-double hallarDistancia(const vector<vector<double>> &distancias, int partida, int llegada);
+int masCercanoNodo1(vector<vector<double>> &distancias, vector<struct Cliente> &copiaClientes, int partida);
 
-double hallarFitness(struct Problema &problemita, vector<struct Vehiculo> &solucion);
+void solucionInicial(struct Problema &, struct Solucion &);
+
+void actualizarRegistrosDeSolucion(vector<vector<double>> &,
+                                   vector<struct Cliente> &,
+                                   struct Solucion &);
+
+int masCercanoNodo(vector<vector<double>> &, vector<struct Cliente> &, int);
+
+double hallarDistancia(const vector<vector<double>> &,int,int);
+
+void hallarFitness(struct Solucion &solucionActual);
+
+double hallarRealTiempoTotal(struct Vehiculo &vehiculo);
+
+int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2);
+
+double hallarFitness1(struct Problema &problemita,vector<struct Vehiculo> &solucion);
 
 double hallarDistanciaRuta(vector<vector<double>> &distancias, const vector<int> ruta);
 
@@ -33,7 +49,7 @@ double hallarCargaTotalRuta(vector<struct Cliente> &clientes, const vector<int> 
 double hallarTiempoRuta(vector<vector<double>> &distancias, 
         vector<struct Cliente> &clientes, const vector<int> ruta);
 
-bool posibleSolucion(const vector<struct Vehiculo> &solucion);
+bool posibleSolucion(const struct Solucion &solucion);
 
 void TInsertar(struct Problema &problemita, struct Solucion& solucion, int lClientes);
 
@@ -56,6 +72,12 @@ void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct C
 
 void VND(struct Problema &problemita, struct Solucion &solucion);
 
+bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
+
+bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
+
+bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
+
 struct Solucion busquedaLocalVehiculosInsertar( struct Problema &problemita, 
         struct Solucion &solucion, int l);
 
@@ -72,6 +94,5 @@ void cambiarVecindario(struct Problema &problemita,
 
 void shaking(Solucion &solucion, int k, Problema &problemita);
 
-void mostraRuta(vector<int> ruta);
 
 #endif /* RESOLUCION_H */

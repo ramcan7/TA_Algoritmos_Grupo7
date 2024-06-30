@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>Cliente.h</itemPath>
-      <itemPath>DatosVehiculo.h</itemPath>
       <itemPath>Funciones Auxiliares.h</itemPath>
       <itemPath>Problema.h</itemPath>
       <itemPath>Solucion.h</itemPath>
@@ -50,8 +49,6 @@
       </compileType>
       <item path="Cliente.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="DatosVehiculo.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="Funciones Auxiliares.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Funciones Auxiliares.h" ex="false" tool="3" flavor2="0">
@@ -90,8 +87,6 @@
         </asmTool>
       </compileType>
       <item path="Cliente.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="DatosVehiculo.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Funciones Auxiliares.cpp" ex="false" tool="1" flavor2="0">
       </item>

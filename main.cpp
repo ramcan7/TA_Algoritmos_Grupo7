@@ -1,6 +1,6 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
+ >> Project:    TA_Algoritmos_Avanzados_G7
  >> File:       main.cpp
  >> Author:     Grupo 7
 [/] */

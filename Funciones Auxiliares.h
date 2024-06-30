@@ -1,8 +1,8 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
- >> File:       Funciones Auxiliares.h
- >> Author:     
+ >> Project:    TA_Algoritmos_Avanzados_G7
+ >> File:       Funciones_Auxiliares.h
+ >> Author:     Grupo 7
 [/] */
 
 #ifndef FUNCIONES_AUXILIARES_H
@@ -13,6 +13,7 @@
 #include <cstring>
 using namespace std;
 #include "Problema.h"
+#include "resolucion.h"
 
                 /*  - / > [ Declaracion de Funciones ] < / -  */
 
@@ -20,7 +21,7 @@ void cargarMatriz(vector<vector<double>> &,const char *);
 
 void cargarClientes(vector<struct Cliente> &,const char *);
 
-void cargarVehiculos(vector <struct DatosVehiculo> &);
+void cargarVehiculos(vector <struct Vehiculo> &);
 
 void imprimirSolucion(const struct Solucion &,const char *);
 

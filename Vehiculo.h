@@ -1,6 +1,6 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
+ >> Project:    TA_Algoritmos_Avanzados_G7
  >> File:       Vehiculo.h
  >> Author:     Grupo 7
 [/] */
@@ -10,15 +10,17 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-#include "DatosVehiculo.h"
 
 struct Vehiculo {
-    struct DatosVehiculo datosVehiculo;
+    int id;
+    int velocidad;
+    double capacidad_max;
     double capacidad_actual;
-    double tiempo_total; //Tiempo que demora con cada cliente
-    double distancia_total; //Distancia de la ruta
+    double tiempo_total;            //Tiempo que demora con cada cliente
+    double distancia_total;         //Distancia de la ruta
     vector<int> ruta; // IDs de los clientes en la ruta
 };
+
 
 
 #endif /* VEHICULO_H */

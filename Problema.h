@@ -1,6 +1,6 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
+ >> Project:    TA_Algoritmos_Avanzados_G7
  >> File:       Problema.h
  >> Author:     Grupo 7
 [/] */
@@ -9,20 +9,22 @@
 #define PROBLEMA_H
 #include <vector>
 #include <algorithm>
+#include <random>
+#include <ctime>
 using namespace std;
 #include "Cliente.h"
 #include "Solucion.h"
 #define POSINICIO 2
 #define CANT_VECHICULOS 5
-#define CARGAMAX 100
-#define VEL_PROM 40 //Falta definir la escala del tiempo y distancia
+#define CARGAMAX 400
+#define TIEMPOMAX 3000
+#define VEL_PROM 2 // En hm/min //Falta definir la escala del tiempo y distancia
 
 struct Problema {
     vector<vector<double>> distancias; // Matriz de distancias entre clientes
     vector<struct Cliente> clientes;
-    vector<struct DatosVehiculo> vehiculos;
+    vector<struct Vehiculo> vehiculos;
     struct Solucion solucion;
-    
 };
 
 

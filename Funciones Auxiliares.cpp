@@ -1,6 +1,6 @@
 
 /* [/]
- >> Project:    ReposteameEstaPablo
+ >> Project:    TA_Algoritmos_Avanzados_G7
  >> File:       Funciones Auxiliares.cpp
  >> Author:     Grupo 7
 [/] */
@@ -71,13 +71,16 @@ void cargarClientes(vector<struct Cliente> &clientes,const char *nombArch){
     }
 }
 // Modulo de Carga de Datos De Vehiculo
-void cargarVehiculos(vector <struct DatosVehiculo> &vehiculos){
+void cargarVehiculos(vector <struct Vehiculo> &vehiculos){
     // Proceso de Carga de Datos
     for(int i = 0;i < CANT_VECHICULOS;i++){
-        struct DatosVehiculo vehiculo;
-        vehiculo.capacidad_max = CARGAMAX;
+        struct Vehiculo vehiculo;
         vehiculo.id = i;
         vehiculo.velocidad = VEL_PROM;
+        vehiculo.capacidad_max = CARGAMAX;
+        vehiculo.capacidad_actual = 0;
+        vehiculo.tiempo_total = 0;
+        vehiculo.distancia_total = 0;
         vehiculos.push_back(vehiculo);
     }
 }
@@ -86,15 +89,22 @@ void imprimirSolucion(const struct Solucion &solucion,
                       const char *nombArch){
     // Apertura de Archivo
     ofstream arch = abrirArchivo_OFS(nombArch);
+    arch<<fixed<<setprecision(2);
+    
+    
+    // Cabecera de la solución
+    imprimirLinea(arch,DIMLINEA,'=');
+    arch<<setw(28)<<"Fitness: "<<solucion.fitnessSolucion<<endl;
+    imprimirLinea(arch,DIMLINEA,'=');
     // Iterativa del Proceso de Impresion de Solucion
-    for(int i = 0;i < solucion.solucionVehiculos.size();i++){
-        struct Vehiculo vehiculo = solucion.solucionVehiculos[i];
-        arch<<setw((DIMLINEA + 10)/2)<<"Vehiculo "<<vehiculo.datosVehiculo.id+1<<endl;
+    for(int i = 0;i < solucion.vehiculos.size();i++){
+        struct Vehiculo vehiculo = solucion.vehiculos[i];
+        arch<<setw((DIMLINEA + 10)/2)<<"Vehiculo "<<vehiculo.id+1<<endl;
         imprimirLinea(arch,DIMLINEA,'-');
         arch<<setw(15)<<"Cap. Actual"<<setw(19)<<"Cap. Maxima";
         arch<<setw(17)<<"Velocidad"<<endl;
         arch<<setw(10)<<vehiculo.capacidad_actual;
-        arch<<setw(20)<<vehiculo.datosVehiculo.capacidad_max<<setw(17)<<vehiculo.datosVehiculo.velocidad;
+        arch<<setw(20)<<vehiculo.capacidad_max<<setw(17)<<vehiculo.velocidad;
         arch<<endl<<endl<<setw((DIMLINEA + 16)/2)<<"RUTA DE CLIENTES"<<endl;
         imprimirLinea(arch,DIMLINEA,'-');
         // Iterativa del Proeso de Impresion de Ruta de Vehiculo
@@ -102,7 +112,9 @@ void imprimirSolucion(const struct Solucion &solucion,
             arch<<setw(24)<<j+1<<") "<<vehiculo.ruta[j]<<endl;
         }
         imprimirLinea(arch,DIMLINEA,'-');
-        arch<<setw(28)<<"Tiempo total requerido: "<<vehiculo.tiempo_total<<endl;
+        arch<<setw(28)<<"Tiempo total requerido en los clientes: "<<vehiculo.tiempo_total<<endl;
+        arch<<setw(32)<<"Distancia total a recorrer: "<<vehiculo.distancia_total<<endl;
+        arch<<setw(32)<<"Tiempo total real requerido: "<<hallarRealTiempoTotal(vehiculo)<<endl;
         imprimirLinea(arch,DIMLINEA,'=');
     }
 }
