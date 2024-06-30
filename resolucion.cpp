@@ -6,41 +6,35 @@
 [/] */
 
 #include "resolucion.h"
+#include <chrono>
 #define L_MIN 1
 #define L_MAX 2
 #define K_MIN 3
 #define K_MAX 5
-#define T_MAX 100
+#define T_MAX 10
 #define CLI_POR_VEH 100
 #define NO_ENCONTRADO -1
 #define PEOR_FITNESS 9999
 #define MAX_INTENTOS 10
-
-//Puntos faltantes con **
-
-
-
 
 
                 /*  - / > [ Definicion de Funciones ] < / -  */
 
 //
 void GVNS(struct Problema &problemita){
-    //
+    // Declaracion de Variables
     struct Solucion solucionAux,x_best;
-    int t = 0, t_best=0;
+    int t = 0,t_best = 0;
+    // Inicializacion de Elementos
     srand(time(NULL));
-    //
-    inicializarSolucion(problemita.vehiculos,solucionAux);
-    solucionInicial1(problemita,solucionAux);
-    imprimirSolucion(problemita, solucionAux,"SolucionIni.txt");
-    //
+    solucionInicial(problemita,solucionAux);
+    imprimirSolucion(problemita,solucionAux,"SolucionIni.txt");
+    // Variable Neighborhood Descent
     VND(problemita,solucionAux);
-    imprimirSolucion(problemita, solucionAux,"SolucionVND1.txt");
-    
-    x_best = solucionAux;
-    cout<<solucionAux.fitnessSolucion<<endl;
+    imprimirSolucion(problemita,solucionAux,"SolucionVND.txt");
     //
+    x_best = solucionAux;
+    auto start = chrono::high_resolution_clock::now();
     do {
         int k = K_MIN;
         solucionAux = x_best;
@@ -49,150 +43,63 @@ void GVNS(struct Problema &problemita){
             do{
                 x_prima = solucionAux;
                 shaking(x_prima,k,problemita);
-                cout<<"shake"<<endl;
-                cout<<x_prima.fitnessSolucion<<endl;
+                cout<<x_prima.fitness<<endl;
             } while (!posibleSolucion(x_prima));
-            cout<<"Salio shake"<<endl;
             struct Solucion x_prima_doble = x_prima;
             VND(problemita,x_prima_doble);
-            t++;
+            auto end = chrono::high_resolution_clock::now();
+            auto duracion = chrono::duration_cast<chrono::seconds>(end - start);
+            t = duracion.count();
             // NeighborhoodChange
-            cambiarVecindario(problemita, solucionAux, x_prima_doble, x_best, k, t, t_best);
-                
+            cambiarVecindario(problemita,solucionAux,x_prima_doble,x_best,k,t,
+                              t_best);
         }
     } while (t < T_MAX);
-    imprimirSolucion(problemita, x_best,"SolucionGNV.txt");
-    
-    problemita.solucion = x_best;
-}
-//
-void solucionInicial1(struct Problema &problemita, struct Solucion& solucionActual){
-    vector<struct Cliente> copiaClientes = problemita.clientes;
-    //Eliminación del punto de partida
-    copiaClientes.erase(copiaClientes.begin()+POSINICIO);
-    
-    int cantVehi = problemita.vehiculos.size();
-    
-    
-    int posCercana;
-    //Selección de los primeros pedidos atendidos
-    for(int i=0; i<cantVehi; i++){
-        posCercana = masCercanoNodo1(problemita.distancias, copiaClientes, POSINICIO);
-        if(posCercana==NO_ENCONTRADO) break;
-        solucionActual.vehiculos[i].ruta.push_back(posCercana);
-    }
-    //Selección de los siguientes nodos atendidos
-    int i=0;
-    while(true){
-        int papa = solucionActual.vehiculos[i].ruta[solucionActual.vehiculos[i].ruta.size()-1];
-        posCercana = masCercanoNodo1(problemita.distancias, copiaClientes, papa);
-        if(posCercana==NO_ENCONTRADO) break;
-        solucionActual.vehiculos[i].ruta.push_back(posCercana);
-        i++;
-        if(i==cantVehi){
-            i=0;
-        }
-    }
-    solucionActual.fitnessSolucion = hallarFitness1(problemita, solucionActual.vehiculos);
-    
-}
-//
-int masCercanoNodo1(vector<vector<double>> &distancias, vector<struct Cliente> &copiaClientes, int partida){
-    double distanciaMin;
-    int posI;
-    
-    int i=0;
-    if(i < copiaClientes.size()){
-        distanciaMin = hallarDistancia(distancias, partida, i);
-        posI = i;
-        for(i=1; i < copiaClientes.size(); i++){
-            double dist = hallarDistancia(distancias, partida, i);
-            if(dist < distanciaMin){
-                distanciaMin = dist;
-                posI = i;
-            }
-        }
-        int posMin = copiaClientes[posI].id;
-        copiaClientes.erase(copiaClientes.begin()+posI);
-        return posMin;
-    }
-    
-    return NO_ENCONTRADO;
-    
-}
-//
-void inicializarSolucion(const vector<struct Vehiculo> &vehiculos,
-                         struct Solucion &solucionAux){
-    for(int i = 0; i < vehiculos.size(); i++){
-        struct Vehiculo vehiculo;
-        vehiculo = vehiculos[i];
-        solucionAux.vehiculos.push_back(vehiculo);
-    }
-}
-//
-void solucionInicial(struct Problema &problemita,struct Solucion &solucionAux){
     //
-    bool hayVehiculosDisponibles = false;
-    int posCercana,cantVehi = problemita.vehiculos.size();
-    // Selección de los primeros pedidos atendidos
-    for(int i = 0; i < cantVehi;i++){
-        posCercana = masCercanoNodo(problemita.distancias,problemita.clientes,POSINICIO);
+    problemita.solucion = x_best;
+    imprimirSolucion(problemita,x_best,"SolucionGVNS.txt");
+}
+//
+void solucionInicial(struct Problema &problemita, struct Solucion& solucionAux){
+    // Declaracion & Inicializacion de Variables
+    int cantVehi = problemita.vehiculos.size(),posCercana,i,partida = POSINICIO;
+    vector<struct Cliente> clientesAux = problemita.clientes;
+    solucionAux.vehiculos = problemita.vehiculos;
+    // Eliminación del punto de partida
+    clientesAux.erase(clientesAux.begin() + POSINICIO);
+    //Selección de los primeros pedidos atendidos
+    for(i = 0;i < cantVehi;i++){
+        posCercana = masCercanoNodo(problemita.distancias,clientesAux,partida);
         if(posCercana == NO_ENCONTRADO) break;
-        solucionAux.vehiculos[i].capacidad_actual += problemita.clientes[posCercana].demanda;
         solucionAux.vehiculos[i].ruta.push_back(posCercana);
     }
     //Selección de los siguientes nodos atendidos
-    for(int i = 0,posInicial;1;){
-        posInicial = solucionAux.vehiculos[i].ruta[solucionAux.vehiculos[i].ruta.size()-1];
-        posCercana = masCercanoNodo(problemita.distancias,problemita.clientes,
-                                    posInicial);
+    for(i = 0;true;i++){
+        partida = solucionAux.vehiculos[i].ruta[solucionAux.vehiculos[i].ruta.size()-1];
+        posCercana = masCercanoNodo(problemita.distancias, clientesAux,partida);
         if(posCercana == NO_ENCONTRADO) break;
-        if(solucionAux.vehiculos[i].capacidad_max >=
-                solucionAux.vehiculos[i].capacidad_actual +
-                problemita.clientes[posCercana].demanda ){
-            hayVehiculosDisponibles = true;
-            solucionAux.vehiculos[i].capacidad_actual += problemita.clientes[posCercana].demanda;
-            solucionAux.vehiculos[i].ruta.push_back(posCercana);
-        } else problemita.clientes[posCercana].atendido = false;
-        i++;
-        if(i == cantVehi){
-            if(!hayVehiculosDisponibles) break;
-            else hayVehiculosDisponibles = false;
-            i = 0;
-        }
+        solucionAux.vehiculos[i].ruta.push_back(posCercana);
+        if(i + 1 == cantVehi) i = -1;
     }
-    //
-    actualizarRegistrosDeSolucion(problemita.distancias,problemita.clientes,
-                                  solucionAux);
-}
-void actualizarRegistrosDeSolucion(vector<vector<double>> &distancias,
-                                   vector<struct Cliente> &clientes,
-                                   struct Solucion &solucionAux){
-    double tiempo,distancia;
-    for(int i = 0;i < solucionAux.vehiculos.size();i++){
-        tiempo = hallarTiempoRuta(distancias,clientes,solucionAux.vehiculos[i].ruta);
-        solucionAux.vehiculos[i].tiempo_total = tiempo;
-        distancia = hallarDistanciaRuta(distancias,solucionAux.vehiculos[i].ruta);
-        solucionAux.vehiculos[i].distancia_total = distancia;
-    }
+    solucionAux.fitness = hallarFitness1(problemita,solucionAux.vehiculos);
 }
 //
-int masCercanoNodo(vector<vector<double>> &distancias,
-                   vector<struct Cliente> &clientes,int partida){
-    //
-    int i = 0,posI = NO_ENCONTRADO,posMin;
-    double distanciaMin = 9999,dist;
-    //
-    for(int i = 0; i < clientes.size(); i++){
-        dist = hallarDistancia(distancias,partida,i);
-        if(i != partida and dist < distanciaMin and not clientes[i].atendido){
-            distanciaMin = dist;
-            if(posI >= 0) clientes[posI].atendido = false;
-            clientes[i].atendido = true;
-            posI = i;
+int masCercanoNodo(vector<vector<double>> &distancias, vector<struct Cliente> &clientesAux, int partida){
+    int posMin,posI = 0,i = 0;
+    double distMin;
+    if(i < clientesAux.size()){
+        distMin = hallarDistancia(distancias,partida,i);
+        for(i = 1; i < clientesAux.size(); i++){
+            double dist = hallarDistancia(distancias,partida,i);
+            if(dist < distMin){
+                distMin = dist;
+                posI = i;
+            }
         }
-    }
-    return posI;
+        posMin = clientesAux[posI].id;
+        clientesAux.erase(clientesAux.begin() + posI);
+        return posMin;
+    } else return NO_ENCONTRADO;
 }
 //
 double hallarDistancia(const vector<vector<double>> &distancias,int partida,
@@ -209,9 +116,7 @@ void VND(struct Problema &problemita,struct Solucion &solucion){
         
         switch(i){
             case 1:
-//                imprimirCasos(solMejoradaPropuesta.vehiculos[1].ruta);
                 encontrado = LSInsertar(problemita, solucion, solMejoradaPropuesta, 1);
-//                imprimirCasos(solMejoradaPropuesta.vehiculos[1].ruta);
                 break;
             case 2:
                 encontrado = LSIntercambiar(problemita, solucion, solMejoradaPropuesta, 1);
@@ -227,28 +132,21 @@ void VND(struct Problema &problemita,struct Solucion &solucion){
     }
 }
 //
-bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes){
+bool LSInsertar(struct Problema& problemita, struct Solucion& solucionAux, struct Solucion &solMejoradaPropuesta, int lClientes){
     //Retorna si se encontró una mejor solución en las vecindades
-    
-//    //Extra
-//    int pop=0;
-//    char nombre[] = "nombre      .txt";
-//    double fit, fat;
-//    //
-    
     bool encontrado = false;
     vector <vector<double>>& distancias = problemita.distancias;
-    for(int i=0; i < solucionActual.vehiculos.size(); i++){
-        struct Vehiculo & vehiculoActual = solucionActual.vehiculos[i];
+    for(int i=0; i < solucionAux.vehiculos.size(); i++){
+        struct Vehiculo & vehiculoActual = solucionAux.vehiculos[i];
         int cantAdmisibles = vehiculoActual.ruta.size() - lClientes + 1;
         int cantAdmisibles2 = vehiculoActual.ruta.size() - lClientes;
         if(cantAdmisibles2 < 1) continue;
+        
         for(int pos=0; pos < cantAdmisibles; pos++){
             for(int nuevaPos=0; nuevaPos < cantAdmisibles2; nuevaPos++){
-                struct Solucion solucion = solucionActual;
+                struct Solucion solucion = solucionAux;
                 struct Vehiculo& vehiculo = solucion.vehiculos[i];
                 int nuevaPos2 = nuevaPos;
-                
                 
                 //Sacar l clientes
                 vector<int> porcion(vehiculo.ruta.begin()+pos, vehiculo.ruta.begin()+pos+lClientes);
@@ -259,14 +157,8 @@ bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, st
                 //Insertar l clientes
                 vehiculo.ruta.insert(vehiculo.ruta.begin()+nuevaPos2, porcion.begin(), porcion.end());
                 
-                
-                
-                solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+                solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
                 if(compararFitness(solucion, solMejoradaPropuesta) > 0){
-                    
-                    
-                    
-                    
                     solMejoradaPropuesta = solucion;
                     encontrado = true;
                 }
@@ -278,24 +170,22 @@ bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, st
     return encontrado;
 }
 //
-void imprimirCasos(struct vector<int> ruta){
+void imprimirCasos(struct vector<int> &ruta){
     for(int i=0; i<ruta.size(); i++){
         cout<<ruta[i]<<" ";
     }
     cout<<endl;
 }
 //
-bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes){
+bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionAux, struct Solucion &solMejoradaPropuesta, int lClientes){
     //Retorna si se encontró una mejor solución en las vecindades
     bool encontrado = false;
     vector <vector<double>>& distancias = problemita.distancias;
     vector <struct Cliente>& clientes = problemita.clientes;
-    for(int i=0; i < solucionActual.vehiculos.size() - 1; i++){
-//        cout<<"Caso 1"<<endl<<endl;
-        for(int j=i+1; j < solucionActual.vehiculos.size(); j++){
-//            cout<<"Caso"<<i<<" "<<j<<endl<<endl;
-            struct Vehiculo & vehiculoActual1 = solucionActual.vehiculos[i];
-            struct Vehiculo & vehiculoActual2 = solucionActual.vehiculos[j];
+    for(int i=0; i < solucionAux.vehiculos.size() - 1; i++){
+        for(int j=i+1; j < solucionAux.vehiculos.size(); j++){
+            struct Vehiculo & vehiculoActual1 = solucionAux.vehiculos[i];
+            struct Vehiculo & vehiculoActual2 = solucionAux.vehiculos[j];
             
             int cantAdmisibles = vehiculoActual1.ruta.size() - lClientes + 1;
             int cantAdmisibles2 = vehiculoActual2.ruta.size() - lClientes + 1;
@@ -303,15 +193,10 @@ bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual
             if(cantAdmisibles <= 0 or cantAdmisibles2 <= 0) continue;
             
             for(int pos1=0; pos1 < cantAdmisibles; pos1++){
-//                cout<<"Vehiculo1"<<endl<<endl;
                 for(int pos2=0; pos2 < cantAdmisibles2; pos2++){
-                    struct Solucion solucion = solucionActual;
+                    struct Solucion solucion = solucionAux;
                     struct Vehiculo& vehiculo1 = solucion.vehiculos[i];
                     struct Vehiculo& vehiculo2 = solucion.vehiculos[j];
-                    
-//                    imprimirCasos(vehiculo1.ruta);
-//                    imprimirCasos(vehiculo2.ruta);
-//                    cout<<endl;
                     
                     //Sacar l clientes de vehículo 1
                     vector<int> porcion1(vehiculo1.ruta.begin()+pos1, vehiculo1.ruta.begin()+pos1+lClientes);
@@ -332,15 +217,9 @@ bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual
                     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+pos2, porcion1.begin(), porcion1.end());
 
 
-                    solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+                    solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
                     
-//                    imprimirCasos(vehiculo1.ruta);
-//                    imprimirCasos(vehiculo2.ruta);
-//                    cout<<endl;
                     if(compararFitness(solucion, solMejoradaPropuesta) > 0){
-                        //Prueba
-//                        cout<<solucion.fitnessSolucion<<" "<<solMejoradaPropuesta.fitnessSolucion<<endl;
-                        
                         solMejoradaPropuesta = solucion;
                         encontrado = true;
                     }
@@ -352,16 +231,16 @@ bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual
     return encontrado;
 }
 //
-bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes){
+bool LSRealocar(struct Problema& problemita, struct Solucion& solucionAux, struct Solucion &solMejoradaPropuesta, int lClientes){
     //Retorna si se encontró una mejor solución en las vecindades
     bool encontrado = false;
     vector <vector<double>>& distancias = problemita.distancias;
     vector <struct Cliente>& clientes = problemita.clientes;
-    for(int i=0; i < solucionActual.vehiculos.size(); i++){
-        for(int j=0; j < solucionActual.vehiculos.size(); j++){
+    for(int i=0; i < solucionAux.vehiculos.size(); i++){
+        for(int j=0; j < solucionAux.vehiculos.size(); j++){
             if(i==j) continue;
-            struct Vehiculo & vehiculoActual1 = solucionActual.vehiculos[i];
-            struct Vehiculo & vehiculoActual2 = solucionActual.vehiculos[j];
+            struct Vehiculo & vehiculoActual1 = solucionAux.vehiculos[i];
+            struct Vehiculo & vehiculoActual2 = solucionAux.vehiculos[j];
             
             int cantAdmisibles = vehiculoActual1.ruta.size() - lClientes + 1;
             int cantAdmisibles2 = vehiculoActual2.ruta.size() + 1;
@@ -370,7 +249,7 @@ bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, st
             
             for(int pos=0; pos < cantAdmisibles; pos++){
                 for(int nuevaPos=0; nuevaPos < cantAdmisibles2; nuevaPos++){
-                    struct Solucion solucion = solucionActual;
+                    struct Solucion solucion = solucionAux;
                     struct Vehiculo & vehiculo1 = solucion.vehiculos[i];
                     struct Vehiculo & vehiculo2 = solucion.vehiculos[j];
 
@@ -385,7 +264,7 @@ bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, st
 
 
                     
-                    solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+                    solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
                     
                     if(compararFitness(solucion, solMejoradaPropuesta) > 0){
                         solMejoradaPropuesta = solucion;
@@ -434,8 +313,8 @@ int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2){
     //Retorna 1 para mejor
     //0 para igual
     //-1 para peor
-    if(solucion1.fitnessSolucion == PEOR_FITNESS){
-        if(solucion2.fitnessSolucion == PEOR_FITNESS){
+    if(solucion1.fitness == PEOR_FITNESS){
+        if(solucion2.fitness == PEOR_FITNESS){
             return 0;
         }
         else{
@@ -443,14 +322,14 @@ int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2){
         }
     }
     else{
-        if(solucion1.fitnessSolucion == PEOR_FITNESS){
+        if(solucion1.fitness == PEOR_FITNESS){
             return 1;
         }
         else{
-            if(solucion1.fitnessSolucion < solucion2.fitnessSolucion){
+            if(solucion1.fitness < solucion2.fitness){
                 return 1;
             }
-            else if(solucion1.fitnessSolucion == solucion2.fitnessSolucion){
+            else if(solucion1.fitness == solucion2.fitness){
                 return 0;
             }
             else{
@@ -495,8 +374,8 @@ double hallarDistanciaRuta(vector<vector<double>> &distancias,
     int cantClientes = ruta.size();
     if(cantClientes > 0){
         distancia = hallarDistancia(distancias,POSINICIO,ruta[0]);
-        for(int i=1; i<cantClientes; i++){
-            distancia += hallarDistancia(distancias, ruta[i], ruta[i-1]);
+        for(int i = 0; i<cantClientes - 1; i++){
+            distancia += hallarDistancia(distancias, ruta[i], ruta[i+1]);
         }
         distancia += hallarDistancia(distancias,ruta[cantClientes-1],POSINICIO);
     }
@@ -523,31 +402,31 @@ void shaking(Solucion &solucion, int k, Problema &problemita){
             case 0:
                 // Insertar l clientes en la misma ruta
                 TInsertar(problemita,solucion,ele);
-                solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
-                cout<<solucion.fitnessSolucion<<endl;
+                solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
+                cout<<solucion.fitness<<endl;
                 break;
             case 1: {
                 // Realocar l clientes entre rutas diferentes
                 TRealocar(problemita, solucion,ele);
-                solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
-                cout<<solucion.fitnessSolucion<<endl;
+                solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
+                cout<<solucion.fitness<<endl;
                 break;
             }
             case 2: {
                 // Intercambiar l clientes entre rutas diferentes
                 TIntercambiar(problemita,solucion,ele);
-                solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
-                cout<<solucion.fitnessSolucion<<endl;
+                solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
+                cout<<solucion.fitness<<endl;
                 break;
             }
         }
     }
     // Recalcular fitness después del shaking
-    solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+    solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
 }
 //
 bool posibleSolucion(const struct Solucion &solucion){
-    if(solucion.fitnessSolucion == PEOR_FITNESS ) return false;
+    if(solucion.fitness == PEOR_FITNESS ) return false;
     return true;
 }
 //
@@ -567,7 +446,7 @@ void TRealocar(struct Problema& problemita, struct Solucion& solucion, int lClie
         if(v1!=v2 and solucion.vehiculos[v1].ruta.size() - lClientes >= 0){
             TRealocarVehiculo(problemita.distancias, problemita.clientes, 
                               solucion.vehiculos[v1], solucion.vehiculos[v2], lClientes);
-            solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+            solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
             break;
         }
     }
@@ -602,7 +481,7 @@ void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int l
         if(v1!=v2 and solucion.vehiculos[v1].ruta.size() - lClientes >= 0 and solucion.vehiculos[v2].ruta.size() - lClientes >= 0){
             TIntercambiarVehiculo(problemita.distancias, problemita.clientes, 
                               solucion.vehiculos[v1], solucion.vehiculos[v2], lClientes);
-            solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
+            solucion.fitness = hallarFitness1(problemita, solucion.vehiculos);
             break;
         }
     }
@@ -626,28 +505,20 @@ void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct C
     vector<int> porcion2(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
     vehiculo2.ruta.erase(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
     
-    
-    
-    
     //Insertar l clientes en vehículo 1
     vehiculo1.ruta.insert(vehiculo1.ruta.begin()+pos1, porcion2.begin(), porcion2.end());
-    
-    
     
     //Insertar l clientes en vehículo 2
     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+pos2, porcion1.begin(), porcion1.end());
     
-    
-    
 }
-
 //NeighborhoodChange
 void cambiarVecindario(struct Problema &problemita,
         struct Solucion &solucionAux, struct Solucion &x_prima_doble, 
         struct Solucion &x_best, int &k, int &t, int mejorT){
-    x_prima_doble.fitnessSolucion = hallarFitness1(problemita, x_prima_doble.vehiculos);
-    x_best.fitnessSolucion = hallarFitness1(problemita, x_best.vehiculos);
-    if(x_prima_doble.fitnessSolucion < x_best.fitnessSolucion){
+    x_prima_doble.fitness = hallarFitness1(problemita, x_prima_doble.vehiculos);
+    x_best.fitness = hallarFitness1(problemita, x_best.vehiculos);
+    if(x_prima_doble.fitness < x_best.fitness){
         x_best = x_prima_doble;
         solucionAux = x_prima_doble;
         k = K_MIN;
@@ -658,26 +529,3 @@ void cambiarVecindario(struct Problema &problemita,
     }
 }
 //
-struct Solucion busquedaLocalVehiculosRealocar( struct Problema &problemita, 
-        struct Solucion &solucion, int lClientes){
-    struct Solucion solPropuesta = solucion;
-    // Realocar l clientes entre rutas diferentes
-    TRealocar(problemita, solPropuesta, lClientes);
-    
-//    for(int i = 0; i < solPropuesta.vehiculos.size(); i++){
-//        TRealocarVehiculo(problemita.distancias, solPropuesta.vehiculos[i], 1);
-//    }
-    return solPropuesta;
-}
-//
-struct Solucion busquedaLocalVehiculosIntercambiar( struct Problema &problemita, 
-        struct Solucion &solucion, int lClientes){
-    struct Solucion solPropuesta = solucion;
-    // Intercambiar l clientes entre rutas diferentes
-    TIntercambiar(problemita, solPropuesta, lClientes);
-    
-//    for(int i = 0; i < solPropuesta.vehiculos.size(); i++){
-//        TIntercambiarVehiculo(problemita.distancias, solPropuesta.vehiculos[i], 1);
-//    }
-    return solPropuesta;
-}

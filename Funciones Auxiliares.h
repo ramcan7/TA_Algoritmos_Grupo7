@@ -31,4 +31,6 @@ ofstream abrirArchivo_OFS(const char *);
 
 void imprimirLinea(ofstream &,int,char);
 
+void imprimirEncabezado(ofstream &,int,char);
+
 #endif /* FUNCIONES_AUXILIARES_H */

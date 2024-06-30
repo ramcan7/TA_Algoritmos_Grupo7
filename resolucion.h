@@ -14,32 +14,45 @@
 
 void GVNS(struct Problema &);
 
-void solucionInicial1(struct Problema &problemita, struct Solucion& solucionActual);
+void solucionInicial(struct Problema &, struct Solucion&);
 
-int masCercanoNodo1(vector<vector<double>> &distancias, vector<struct Cliente> &copiaClientes, int partida);
+int masCercanoNodo(vector<vector<double>> &, vector<struct Cliente> &, int);
 
-void inicializarSolucion(const vector<struct Vehiculo> &, struct Solucion &);
 
-void solucionInicial(struct Problema &, struct Solucion &);
 
 void actualizarRegistrosDeSolucion(vector<vector<double>> &,
                                    vector<struct Cliente> &,
                                    struct Solucion &);
 
-int masCercanoNodo(vector<vector<double>> &, vector<struct Cliente> &, int);
 
 double hallarDistancia(const vector<vector<double>> &,int,int);
+
+void VND(struct Problema &, struct Solucion &);
+
+bool LSInsertar(struct Problema&, struct Solucion&, struct Solucion &, int);
+
+void imprimirCasos(struct vector<int>& ruta);
+
+bool LSIntercambiar(struct Problema&, struct Solucion&, struct Solucion &, int);
+
+bool LSRealocar(struct Problema&, struct Solucion&, struct Solucion &, int);
+
+void TInsertar(struct Problema &, struct Solucion&, int);
+
+void TInsertarVehiculo(vector <vector <double>>&, struct Vehiculo &, int);
 
 int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2);
 
 double hallarFitness1(struct Problema &problemita,vector<struct Vehiculo> &solucion);
 
+double hallarTiempoRuta(vector<vector<double>> &distancias, 
+        vector<struct Cliente> &clientes, const vector<int> ruta);
+
 double hallarDistanciaRuta(vector<vector<double>> &distancias, const vector<int> ruta);
 
 double hallarTiempoPorClienteRuta(vector<struct Cliente> &clientes, const vector<int> ruta);
 
-double hallarTiempoRuta(vector<vector<double>> &distancias, 
-        vector<struct Cliente> &clientes, const vector<int> ruta);
+void shaking(Solucion &solucion, int k, Problema &problemita);
 
 bool posibleSolucion(const struct Solucion &solucion);
 
@@ -55,35 +68,10 @@ void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int l
 void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
         struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes);
 
-void VND(struct Problema &problemita, struct Solucion &solucion);
-
-void imprimirCasos(struct vector<int> ruta);
-
-bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
-
-bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
-
-bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes);
-
-void TInsertar(struct Problema &problemita, struct Solucion& solucion, int lClientes);
-
-void TInsertarVehiculo(vector <vector <double>>& distancias, struct Vehiculo &vehiculo, int lClientes);
-
-struct Solucion busquedaLocalVehiculosInsertar( struct Problema &problemita, 
-        struct Solucion &solucion, int l);
-
-struct Solucion busquedaLocalVehiculosRealocar( struct Problema &problemita, 
-        struct Solucion &solucion, int l);
-
-struct Solucion busquedaLocalVehiculosIntercambiar( struct Problema &problemita, 
-        struct Solucion &solucion, int l);
-
 void cambiarVecindario(struct Problema &problemita,
         struct Solucion &solPropuesta, struct Solucion &solLocalMejorada, 
         struct Solucion &mejorSolucion, int &k, int &t, int mejorT);
 
-
-void shaking(Solucion &solucion, int k, Problema &problemita);
 
 
 #endif /* RESOLUCION_H */

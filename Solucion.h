@@ -10,7 +10,7 @@
 
 struct Solucion{
     vector<struct Vehiculo> vehiculos;
-    double fitnessSolucion;
+    double fitness;
 };
 
 #endif /* SOLUCION_H */

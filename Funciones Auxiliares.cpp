@@ -6,7 +6,7 @@
 [/] */
 
 #include "Funciones Auxiliares.h"
-#define DIMLINEA 55
+#define DIMLINEA 65
 
                 /*  - / > [ Definicion de Funciones ] < / -  */
 
@@ -90,33 +90,40 @@ void imprimirSolucion(struct Problema& problemita, struct Solucion& solucion,
     // Apertura de Archivo
     ofstream arch = abrirArchivo_OFS(nombArch);
     arch<<fixed<<setprecision(2);
-    
-    
     // Cabecera de la solución
     imprimirLinea(arch,DIMLINEA,'=');
-    arch<<setw(28)<<"Fitness: "<<solucion.fitnessSolucion<<endl;
+    arch<<setw((DIMLINEA + 22)/2)<<"FITNESS DE LA SOLUCION"<<endl;
+    arch<<setw((DIMLINEA + 7)/2)<<solucion.fitness<<endl;
     imprimirLinea(arch,DIMLINEA,'=');
     // Iterativa del Proceso de Impresion de Solucion
-    for(int i = 0;i < solucion.vehiculos.size();i++){
+    for(int i = 0,j;i < solucion.vehiculos.size();i++){
         struct Vehiculo vehiculo = solucion.vehiculos[i];
-        arch<<setw((DIMLINEA + 10)/2)<<"Vehiculo "<<vehiculo.id+1<<endl;
+        arch<<setw((DIMLINEA + 8)/2)<<"Vehiculo #";
+        arch<<setfill('0')<<setw(2)<<vehiculo.id+1<<setfill(' ')<<endl;
         imprimirLinea(arch,DIMLINEA,'-');
-        arch<<setw(15)<<"Cap. Actual"<<setw(19)<<"Cap. Maxima";
-        arch<<setw(17)<<"Velocidad"<<endl;
-        arch<<setw(10)<<hallarCargaTotalRuta(problemita.clientes, vehiculo.ruta);
-        arch<<setw(20)<<vehiculo.capacidad_max<<setw(17)<<vehiculo.velocidad;
-        arch<<endl<<endl<<setw((DIMLINEA + 16)/2)<<"RUTA DE CLIENTES"<<endl;
-        imprimirLinea(arch,DIMLINEA,'-');
-        // Iterativa del Proeso de Impresion de Ruta de Vehiculo
-        for(int j = 0;j < vehiculo.ruta.size();j++){
-            arch<<setw(24)<<j+1<<") "<<vehiculo.ruta[j]<<endl;
+        imprimirEncabezado(arch,DIMLINEA,'A');
+        arch<<setw(13)<<hallarCargaTotalRuta(problemita.clientes,vehiculo.ruta);
+        arch<<setw(15)<<vehiculo.capacidad_max<<setw(12)<<vehiculo.velocidad;
+        arch<<setw(15)<<vehiculo.ruta.size()<<endl;
+        imprimirEncabezado(arch,DIMLINEA,'B');
+        arch<<setw(18)<<"P. INICIO   -->"<<setw(9)<<vehiculo.ruta[0];
+        arch<<setw(17)<<hallarDistancia(problemita.distancias,POSINICIO,vehiculo.ruta[0]);
+        arch<<setw(16)<<problemita.clientes[vehiculo.ruta[0]].demanda<<endl;
+        for(j = 0;j < vehiculo.ruta.size() - 1;j++){
+            arch<<setw(9)<<vehiculo.ruta[j]<<setw(9)<<"-->"<<setw(9)<<vehiculo.ruta[j+1];
+            arch<<setw(17)<<hallarDistancia(problemita.distancias,vehiculo.ruta[j],vehiculo.ruta[j+1]);
+            arch<<setw(16)<<problemita.clientes[vehiculo.ruta[j+1]].demanda<<endl;
         }
+        arch<<setw(9)<<vehiculo.ruta[j]<<setw(9)<<"-->"<<setw(12)<<"P. INICIO";
+        arch<<setw(14)<<hallarDistancia(problemita.distancias,vehiculo.ruta[j],POSINICIO);
+        arch<<setw(16)<<"- - -"<<endl;
         imprimirLinea(arch,DIMLINEA,'-');
-        hallarDistanciaRuta(problemita.distancias, vehiculo.ruta);
-        arch<<setw(28)<<"Tiempo total requerido en los clientes: "<<hallarTiempoPorClienteRuta(problemita.clientes, vehiculo.ruta)<<endl;
-        arch<<setw(32)<<"Distancia total a recorrer: "<<hallarDistanciaRuta(problemita.distancias, vehiculo.ruta)<<endl;
-        
-        arch<<setw(32)<<"Tiempo total real requerido: "<<hallarTiempoRuta(problemita.distancias, problemita.clientes, vehiculo.ruta)<<endl;
+        arch<<setw(31)<<"Distancia total a recorrer:";
+        arch<<setw(13)<<hallarDistanciaRuta(problemita.distancias, vehiculo.ruta)<<endl;
+        arch<<setw(24)<<"Capacidad demandada:";
+        arch<<setw(20)<<hallarTiempoPorClienteRuta(problemita.clientes, vehiculo.ruta)<<endl;
+        arch<<setw(27)<<"Tiempo total requerido:";
+        arch<<setw(17)<<hallarTiempoRuta(problemita.distancias, problemita.clientes,vehiculo.ruta)<<endl;
         imprimirLinea(arch,DIMLINEA,'=');
     }
 }
@@ -138,4 +145,30 @@ ofstream abrirArchivo_OFS(const char *nombArch){
 void imprimirLinea(ofstream &arch,int dim,char simbolo){
     for(int i = 0;i < dim;i++) arch.put(simbolo);
     arch<<endl;
+}
+//
+void imprimirEncabezado(ofstream &arch,int dim,char seleccion){
+    if(seleccion == 'A'){
+        arch<<setw(15)<<"Cap. Actual"<<setw(15)<<"Cap. Maxima";
+        arch<<setw(13)<<"Velocidad"<<setw(18)<<"Num. Atendidos"<<endl;
+    } else if(seleccion == 'B'){
+        imprimirLinea(arch,DIMLINEA,'-');
+        arch<<setw((DIMLINEA + 11)/2)<<"> R U T A <"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+        arch<<setw(29)<<"PARTIDA    -->    LLEGADA";
+        arch<<setw(17)<<"DISTANCIA"<<setw(15)<<"DEMANDA"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+    } else if(seleccion == 'C'){
+        arch<<endl<<endl<<setw((DIMLINEA + 7)/2)<<"R U T A"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+        arch<<setw(29)<<"PARTIDA    -->    LLEGADA";
+        arch<<setw(17)<<"DISTANCIA"<<setw(15)<<"DEMANDA"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+    } else if(seleccion == 'B'){
+        arch<<endl<<endl<<setw((DIMLINEA + 7)/2)<<"R U T A"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+        arch<<setw(29)<<"PARTIDA    -->    LLEGADA";
+        arch<<setw(17)<<"DISTANCIA"<<setw(15)<<"DEMANDA"<<endl;
+        imprimirLinea(arch,DIMLINEA,'-');
+    }
 }

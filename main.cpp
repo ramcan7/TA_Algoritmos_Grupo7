@@ -22,8 +22,7 @@ int main(int argc, char** argv) {
     cargarVehiculos(problemita.vehiculos);
     // Resolucion del Problema
     GVNS(problemita);
-    // Impresion de Solucion
-    imprimirSolucion(problemita, problemita.solucion,"Solucion.txt");
-    
+//    solucionInicial1(problemita,problemita.solucion);
+//    imprimirSolucion(problemita,problemita.solucion,"SolucionGVNS.txt");
     return 0;
 }
