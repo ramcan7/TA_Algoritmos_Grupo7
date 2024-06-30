@@ -35,7 +35,7 @@ double hallarTiempoRuta(vector<vector<double>> &distancias,
 
 bool posibleSolucion(const vector<struct Vehiculo> &solucion);
 
-void TInsertar(struct Solucion& solucion, int lClientes);
+void TInsertar(struct Problema &problemita, struct Solucion& solucion, int lClientes);
 
 void TInsertarVehiculo(vector <vector <double>>& distancias, struct Vehiculo &vehiculo, int lClientes);
 
@@ -44,19 +44,33 @@ void reacomodarDistanciaPorSaque(const vector <vector <double>>& distancias, str
 void reacomodarDistanciaPorIngreso(const vector <vector <double>>& distancias, 
         struct Vehiculo &vehiculo, int lClientes, int nuevaPos, int cantAdmisibles, const vector <int> &porcion);
 
+void TRealocar(struct Problema& problemita, struct Solucion& solucion, int lClientes);
+
 void TRealocarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
         struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes);
+
+void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int lClientes);
 
 void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
         struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes);
 
+void VND(struct Problema &problemita, struct Solucion &solucion);
+
+struct Solucion busquedaLocalVehiculosInsertar( struct Problema &problemita, 
+        struct Solucion &solucion, int l);
+
+struct Solucion busquedaLocalVehiculosRealocar( struct Problema &problemita, 
+        struct Solucion &solucion, int l);
+
+struct Solucion busquedaLocalVehiculosIntercambiar( struct Problema &problemita, 
+        struct Solucion &solucion, int l);
+
+void cambiarVecindario(struct Problema &problemita,
+        struct Solucion &solPropuesta, struct Solucion &solLocalMejorada, 
+        struct Solucion &mejorSolucion, int &k, int &t, int mejorT);
 
 
-
-
-
-
-
+void shaking(Solucion &solucion, int k, Problema &problemita);
 
 void mostraRuta(vector<int> ruta);
 
