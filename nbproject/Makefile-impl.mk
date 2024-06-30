@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=TA_Algoritmos_Avanzados_G7
+PROJECTNAME=TA_Algoritmos_Grupo7
 
 # Active Configuration
 DEFAULTCONF=Debug

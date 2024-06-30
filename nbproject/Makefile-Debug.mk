@@ -58,11 +58,11 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_avanzados_g7.exe
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_grupo7.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_avanzados_g7.exe: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_grupo7.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_avanzados_g7 ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/ta_algoritmos_grupo7 ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 .NO_PARALLEL:${OBJECTDIR}/Funciones\ Auxiliares.o
 ${OBJECTDIR}/Funciones\ Auxiliares.o: Funciones\ Auxiliares.cpp

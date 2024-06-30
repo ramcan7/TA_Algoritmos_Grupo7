@@ -43,7 +43,8 @@ void GVNS(struct Problema &problemita){
             do{
                 x_prima = solucionAux;
                 shaking(x_prima,k,problemita);
-                cout<<x_prima.fitness<<endl;
+                cout<<"Procesando..."<<endl;
+                cout<<fixed<<setprecision(2)<<x_prima.fitness<<endl;
             } while (!posibleSolucion(x_prima));
             struct Solucion x_prima_doble = x_prima;
             VND(problemita,x_prima_doble);
