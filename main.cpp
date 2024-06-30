@@ -21,8 +21,10 @@ int main(int argc, char** argv) {
     cargarClientes(problemita.clientes,"Clientes.txt");
     cargarVehiculos(problemita.vehiculos);
     // Resolucion del Problema
-    GVNS(problemita);
-//    solucionInicial1(problemita,problemita.solucion);
-//    imprimirSolucion(problemita,problemita.solucion,"SolucionGVNS.txt");
+    GVNS(problemita, 2);
+    //inicialHeurístico
+    GVNS(problemita, 1);
+    //inicialGrasp
+    
     return 0;
 }

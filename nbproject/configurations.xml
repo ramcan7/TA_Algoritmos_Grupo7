@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>Cliente.h</itemPath>
       <itemPath>Funciones Auxiliares.h</itemPath>
+      <itemPath>GRASP.h</itemPath>
       <itemPath>Problema.h</itemPath>
       <itemPath>Solucion.h</itemPath>
       <itemPath>Vehiculo.h</itemPath>
@@ -19,6 +20,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>Funciones Auxiliares.cpp</itemPath>
+      <itemPath>GRASP.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
       <itemPath>resolucion.cpp</itemPath>
     </logicalFolder>
@@ -49,6 +51,10 @@
       <item path="Funciones Auxiliares.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Funciones Auxiliares.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GRASP.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GRASP.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Problema.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -88,6 +94,10 @@
       <item path="Funciones Auxiliares.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Funciones Auxiliares.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GRASP.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GRASP.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Problema.h" ex="false" tool="3" flavor2="0">
       </item>

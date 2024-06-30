@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Funciones\ Auxiliares.o \
+	${OBJECTDIR}/GRASP.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/resolucion.o
 
@@ -69,6 +70,11 @@ ${OBJECTDIR}/Funciones\ Auxiliares.o: Funciones\ Auxiliares.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Funciones\ Auxiliares.o Funciones\ Auxiliares.cpp
+
+${OBJECTDIR}/GRASP.o: GRASP.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GRASP.o GRASP.cpp
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}

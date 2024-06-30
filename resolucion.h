@@ -12,7 +12,7 @@
 
                 /*  - / > [ Declaracion de Funciones ] < / -  */
 
-void GVNS(struct Problema &);
+void GVNS(struct Problema &, int);
 
 void solucionInicial(struct Problema &, struct Solucion&);
 

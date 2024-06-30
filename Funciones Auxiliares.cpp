@@ -6,6 +6,7 @@
 [/] */
 
 #include "Funciones Auxiliares.h"
+#include <string>
 #define DIMLINEA 65
 
                 /*  - / > [ Definicion de Funciones ] < / -  */
@@ -86,9 +87,13 @@ void cargarVehiculos(vector <struct Vehiculo> &vehiculos){
 }
 // Modulo de Impresion de Datos de Solucion
 void imprimirSolucion(struct Problema& problemita, struct Solucion& solucion,
-                      const char *nombArch){
+                      const char *nombreArch, int opcion){
+    string nombArch;
+    if(opcion==1) nombArch = "NN";
+    else nombArch = "Grasp";
+    nombArch.append(nombreArch);
     // Apertura de Archivo
-    ofstream arch = abrirArchivo_OFS(nombArch);
+    ofstream arch = abrirArchivo_OFS(nombArch.c_str());
     arch<<fixed<<setprecision(2);
     // Cabecera de la solución
     imprimirLinea(arch,DIMLINEA,'=');

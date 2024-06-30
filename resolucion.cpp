@@ -6,6 +6,7 @@
 [/] */
 
 #include "resolucion.h"
+#include "GRASP.h"
 #include <chrono>
 #define L_MIN 1
 #define L_MAX 2
@@ -21,17 +22,18 @@
                 /*  - / > [ Definicion de Funciones ] < / -  */
 
 //
-void GVNS(struct Problema &problemita){
+void GVNS(struct Problema &problemita, int opcion){
     // Declaracion de Variables
     struct Solucion solucionAux,x_best;
     int t = 0,t_best = 0;
     // Inicializacion de Elementos
     srand(time(NULL));
-    solucionInicial(problemita,solucionAux);
-    imprimirSolucion(problemita,solucionAux,"SolucionIni.txt");
+    if(opcion==1) solucionInicial(problemita,solucionAux);
+    else solucionInicialGrasp(problemita, solucionAux);
+    imprimirSolucion(problemita,solucionAux,"SolucionIni.txt", opcion);
     // Variable Neighborhood Descent
     VND(problemita,solucionAux);
-    imprimirSolucion(problemita,solucionAux,"SolucionVND.txt");
+    imprimirSolucion(problemita,solucionAux,"SolucionVND.txt", opcion);
     //
     x_best = solucionAux;
     auto start = chrono::high_resolution_clock::now();
@@ -58,7 +60,7 @@ void GVNS(struct Problema &problemita){
     } while (t < T_MAX);
     //
     problemita.solucion = x_best;
-    imprimirSolucion(problemita,x_best,"SolucionGVNS.txt");
+    imprimirSolucion(problemita,x_best,"SolucionGVNS.txt", opcion);
 }
 //
 void solucionInicial(struct Problema &problemita, struct Solucion& solucionAux){
@@ -92,7 +94,7 @@ int masCercanoNodo(vector<vector<double>> &distancias, vector<struct Cliente> &c
         distMin = hallarDistancia(distancias,partida,i);
         for(i = 1; i < clientesAux.size(); i++){
             double dist = hallarDistancia(distancias,partida,i);
-            if(dist < distMin){
+            if(partida!=i and dist < distMin){
                 distMin = dist;
                 posI = i;
             }
