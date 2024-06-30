@@ -85,7 +85,7 @@ void cargarVehiculos(vector <struct Vehiculo> &vehiculos){
     }
 }
 // Modulo de Impresion de Datos de Solucion
-void imprimirSolucion(const struct Solucion &solucion,
+void imprimirSolucion(struct Problema& problemita, struct Solucion& solucion,
                       const char *nombArch){
     // Apertura de Archivo
     ofstream arch = abrirArchivo_OFS(nombArch);
@@ -103,7 +103,7 @@ void imprimirSolucion(const struct Solucion &solucion,
         imprimirLinea(arch,DIMLINEA,'-');
         arch<<setw(15)<<"Cap. Actual"<<setw(19)<<"Cap. Maxima";
         arch<<setw(17)<<"Velocidad"<<endl;
-        arch<<setw(10)<<vehiculo.capacidad_actual;
+        arch<<setw(10)<<hallarCargaTotalRuta(problemita.clientes, vehiculo.ruta);
         arch<<setw(20)<<vehiculo.capacidad_max<<setw(17)<<vehiculo.velocidad;
         arch<<endl<<endl<<setw((DIMLINEA + 16)/2)<<"RUTA DE CLIENTES"<<endl;
         imprimirLinea(arch,DIMLINEA,'-');
@@ -112,9 +112,11 @@ void imprimirSolucion(const struct Solucion &solucion,
             arch<<setw(24)<<j+1<<") "<<vehiculo.ruta[j]<<endl;
         }
         imprimirLinea(arch,DIMLINEA,'-');
-        arch<<setw(28)<<"Tiempo total requerido en los clientes: "<<vehiculo.tiempo_total<<endl;
-        arch<<setw(32)<<"Distancia total a recorrer: "<<vehiculo.distancia_total<<endl;
-        arch<<setw(32)<<"Tiempo total real requerido: "<<hallarRealTiempoTotal(vehiculo)<<endl;
+        hallarDistanciaRuta(problemita.distancias, vehiculo.ruta);
+        arch<<setw(28)<<"Tiempo total requerido en los clientes: "<<hallarTiempoPorClienteRuta(problemita.clientes, vehiculo.ruta)<<endl;
+        arch<<setw(32)<<"Distancia total a recorrer: "<<hallarDistanciaRuta(problemita.distancias, vehiculo.ruta)<<endl;
+        
+        arch<<setw(32)<<"Tiempo total real requerido: "<<hallarTiempoRuta(problemita.distancias, problemita.clientes, vehiculo.ruta)<<endl;
         imprimirLinea(arch,DIMLINEA,'=');
     }
 }

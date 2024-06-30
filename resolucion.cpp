@@ -13,7 +13,7 @@
 #define T_MAX 100
 #define CLI_POR_VEH 100
 #define NO_ENCONTRADO -1
-#define PEOR_FITNESS -1
+#define PEOR_FITNESS 9999
 #define MAX_INTENTOS 10
 
 //Puntos faltantes con **
@@ -33,10 +33,10 @@ void GVNS(struct Problema &problemita){
     //
     inicializarSolucion(problemita.vehiculos,solucionAux);
     solucionInicial1(problemita,solucionAux);
-    imprimirSolucion(solucionAux,"SolucionIni.txt");
+    imprimirSolucion(problemita, solucionAux,"SolucionIni.txt");
     //
     VND(problemita,solucionAux);
-    imprimirSolucion(solucionAux,"SolucionVND1.txt");
+    imprimirSolucion(problemita, solucionAux,"SolucionVND1.txt");
     
     x_best = solucionAux;
     cout<<solucionAux.fitnessSolucion<<endl;
@@ -61,7 +61,7 @@ void GVNS(struct Problema &problemita){
                 
         }
     } while (t < T_MAX);
-    imprimirSolucion(x_best,"SolucionGNV.txt");
+    imprimirSolucion(problemita, x_best,"SolucionGNV.txt");
     
     problemita.solucion = x_best;
 }
@@ -93,33 +93,8 @@ void solucionInicial1(struct Problema &problemita, struct Solucion& solucionActu
             i=0;
         }
     }
-    //Falta hacerle los cambios para que sea admisible **
-    llenarFitnessYMas(problemita, solucionActual);
+    solucionActual.fitnessSolucion = hallarFitness1(problemita, solucionActual.vehiculos);
     
-}
-//
-void llenarFitnessYMas(struct Problema &problemita, struct Solucion& solucionActual){
-    int i;
-    double tiempoAcumulado = 0, tiempo;
-    vector<Vehiculo> & vehiculos = solucionActual.vehiculos;
-    bool funciona = true;
-    for(i = 0; i < vehiculos.size();i++){
-        vehiculos[i].tiempo_total = hallarTiempoPorClienteRuta(problemita.clientes, vehiculos[i].ruta);
-        vehiculos[i].distancia_total = hallarDistanciaRuta(problemita.distancias, vehiculos[i].ruta);
-        vehiculos[i].capacidad_actual = hallarCargaTotalRuta(problemita.clientes, vehiculos[i].ruta);
-        tiempo = hallarRealTiempoTotal(vehiculos[i]);
-        tiempoAcumulado += tiempo;
-        if(vehiculos[i].capacidad_actual > CARGAMAX or vehiculos[i].ruta.size() > CLI_POR_VEH or  tiempo > TIEMPOMAX){
-            funciona = false;
-        }
-    }
-    if(funciona){
-        
-        solucionActual.fitnessSolucion = tiempoAcumulado/i;
-    }
-    else{
-        solucionActual.fitnessSolucion = PEOR_FITNESS;
-    }
 }
 //
 int masCercanoNodo1(vector<vector<double>> &distancias, vector<struct Cliente> &copiaClientes, int partida){
@@ -201,14 +176,6 @@ void actualizarRegistrosDeSolucion(vector<vector<double>> &distancias,
         solucionAux.vehiculos[i].distancia_total = distancia;
     }
 }
-
-//
-void agregarHaciaRutaSolucion(const vector<vector<double>> &distancias,
-                              const vector<struct Cliente> &clientes,
-                              struct Solucion &solucionAux,int posVehiculo,
-                              int partida,int posCercana){
-    
-}
 //
 int masCercanoNodo(vector<vector<double>> &distancias,
                    vector<struct Cliente> &clientes,int partida){
@@ -242,7 +209,9 @@ void VND(struct Problema &problemita,struct Solucion &solucion){
         
         switch(i){
             case 1:
+//                imprimirCasos(solMejoradaPropuesta.vehiculos[1].ruta);
                 encontrado = LSInsertar(problemita, solucion, solMejoradaPropuesta, 1);
+//                imprimirCasos(solMejoradaPropuesta.vehiculos[1].ruta);
                 break;
             case 2:
                 encontrado = LSIntercambiar(problemita, solucion, solMejoradaPropuesta, 1);
@@ -261,11 +230,11 @@ void VND(struct Problema &problemita,struct Solucion &solucion){
 bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes){
     //Retorna si se encontró una mejor solución en las vecindades
     
-    //Extra
-    int pop=0;
-    char nombre[] = "nombre      .txt";
-    double fit, fat;
-    //
+//    //Extra
+//    int pop=0;
+//    char nombre[] = "nombre      .txt";
+//    double fit, fat;
+//    //
     
     bool encontrado = false;
     vector <vector<double>>& distancias = problemita.distancias;
@@ -273,69 +242,31 @@ bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, st
         struct Vehiculo & vehiculoActual = solucionActual.vehiculos[i];
         int cantAdmisibles = vehiculoActual.ruta.size() - lClientes + 1;
         int cantAdmisibles2 = vehiculoActual.ruta.size() - lClientes;
-        if(cantAdmisibles2 <= 1) continue;
+        if(cantAdmisibles2 < 1) continue;
         for(int pos=0; pos < cantAdmisibles; pos++){
             for(int nuevaPos=0; nuevaPos < cantAdmisibles2; nuevaPos++){
                 struct Solucion solucion = solucionActual;
                 struct Vehiculo& vehiculo = solucion.vehiculos[i];
                 int nuevaPos2 = nuevaPos;
                 
-                //Extra
-//                hallarFitness(solucion);
-//                fit = hallarFitness1(problemita, solucion.vehiculos);
-//                fat = solucion.fitnessSolucion;
-//                int pi = fit;
-//                int pooo = fat;
-//                if(fat - fit > 0.0001 or fit - fat < 0.0001){
-//                    cout<<" p2";
-//                }
-//                cout<<"Antes del reacomodo: "<<solucion.fitnessSolucion<<" ";
-                //
-                //Actualizar la distancia
-//                reacomodarDistanciaPorSaque(distancias, vehiculo, lClientes, pos, cantAdmisibles);
+                
                 //Sacar l clientes
                 vector<int> porcion(vehiculo.ruta.begin()+pos, vehiculo.ruta.begin()+pos+lClientes);
                 vehiculo.ruta.erase(vehiculo.ruta.begin()+pos, vehiculo.ruta.begin()+pos+lClientes);
                 
-                //Extra
-//                hallarFitness(solucion);
-//                fit = hallarFitness1(problemita, solucion.vehiculos);
-//                fat = solucion.fitnessSolucion;
-//                if(fat - fit > 0.0001 or fit - fat < 0.0001){
-//                    cout<<" p2";
-//                }
-                
-                
-//                cout<<"Después del reacomodo1: "<<solucion.fitnessSolucion<<" ";
-                //
-                
-
                 if(nuevaPos >= pos) nuevaPos2 = nuevaPos + 1;
-                //Actualizar la distancia
-//                reacomodarDistanciaPorIngreso(distancias, vehiculo, lClientes, nuevaPos2, cantAdmisibles2, porcion);
+                
                 //Insertar l clientes
                 vehiculo.ruta.insert(vehiculo.ruta.begin()+nuevaPos2, porcion.begin(), porcion.end());
                 
-                //Extra
-//                hallarFitness(solucion);
-//                if(solucion.fitnessSolucion < 0){
-//                    cout<<" p3";
-//                }
-//                cout<<"Después del reacomodo2: "<<solucion.fitnessSolucion<<endl;
-                //
+                
+                
                 solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                 if(compararFitness(solucion, solMejoradaPropuesta) > 0){
-                    if(solucion.fitnessSolucion<0){
-                        cout<<"ppp"<<endl;
-                    }
                     
-//                    nombre[11] = '0' + pop%10;
-//                    nombre[10] = '0' + (pop/10)%10;
-//                    nombre[9] = '0' + (pop/100)%10;
-//                    imprimirSolucion(solucion, nombre);
-//                    pop++;
                     
-                    cout<<solucion.fitnessSolucion<<" "<<solMejoradaPropuesta.fitnessSolucion<<endl;
+                    
+                    
                     solMejoradaPropuesta = solucion;
                     encontrado = true;
                 }
@@ -347,7 +278,12 @@ bool LSInsertar(struct Problema& problemita, struct Solucion& solucionActual, st
     return encontrado;
 }
 //
-
+void imprimirCasos(struct vector<int> ruta){
+    for(int i=0; i<ruta.size(); i++){
+        cout<<ruta[i]<<" ";
+    }
+    cout<<endl;
+}
 //
 bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual, struct Solucion &solMejoradaPropuesta, int lClientes){
     //Retorna si se encontró una mejor solución en las vecindades
@@ -355,7 +291,9 @@ bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual
     vector <vector<double>>& distancias = problemita.distancias;
     vector <struct Cliente>& clientes = problemita.clientes;
     for(int i=0; i < solucionActual.vehiculos.size() - 1; i++){
+//        cout<<"Caso 1"<<endl<<endl;
         for(int j=i+1; j < solucionActual.vehiculos.size(); j++){
+//            cout<<"Caso"<<i<<" "<<j<<endl<<endl;
             struct Vehiculo & vehiculoActual1 = solucionActual.vehiculos[i];
             struct Vehiculo & vehiculoActual2 = solucionActual.vehiculos[j];
             
@@ -365,63 +303,44 @@ bool LSIntercambiar(struct Problema& problemita, struct Solucion& solucionActual
             if(cantAdmisibles <= 0 or cantAdmisibles2 <= 0) continue;
             
             for(int pos1=0; pos1 < cantAdmisibles; pos1++){
+//                cout<<"Vehiculo1"<<endl<<endl;
                 for(int pos2=0; pos2 < cantAdmisibles2; pos2++){
                     struct Solucion solucion = solucionActual;
                     struct Vehiculo& vehiculo1 = solucion.vehiculos[i];
                     struct Vehiculo& vehiculo2 = solucion.vehiculos[j];
                     
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorSaque(distancias, vehiculo1, lClientes, pos1, cantAdmisibles);
+//                    imprimirCasos(vehiculo1.ruta);
+//                    imprimirCasos(vehiculo2.ruta);
+//                    cout<<endl;
+                    
                     //Sacar l clientes de vehículo 1
                     vector<int> porcion1(vehiculo1.ruta.begin()+pos1, vehiculo1.ruta.begin()+pos1+lClientes);
                     vehiculo1.ruta.erase(vehiculo1.ruta.begin()+pos1, vehiculo1.ruta.begin()+pos1+lClientes);
-
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorSaque(distancias, vehiculo2, lClientes, pos2, cantAdmisibles2);
+                    
                     //Sacar l clientes de vehículo 2
                     vector<int> porcion2(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
                     vehiculo2.ruta.erase(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
 
 
 
-
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorIngreso(distancias, vehiculo1, lClientes, pos1, cantAdmisibles-1, porcion2);
                     //Insertar l clientes en vehículo 1
                     vehiculo1.ruta.insert(vehiculo1.ruta.begin()+pos1, porcion2.begin(), porcion2.end());
 
 
 
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorIngreso(distancias, vehiculo2, lClientes, pos2, cantAdmisibles2 - 1, porcion1);
                     //Insertar l clientes en vehículo 2
                     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+pos2, porcion1.begin(), porcion1.end());
 
 
-                    //Modificar los tiempos totales por cliente
-                    double tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion1);
-                    vehiculo1.tiempo_total -= tiempoCambiado;
-                    vehiculo2.tiempo_total += tiempoCambiado;
-
-                    tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion2);
-                    vehiculo2.tiempo_total -= tiempoCambiado;
-                    vehiculo1.tiempo_total += tiempoCambiado;
-
-                    //Modificar las cargas totales
-                    double cargaCambiada = hallarCargaTotalRuta(clientes, porcion1);
-                    vehiculo1.capacidad_actual -= cargaCambiada;
-                    vehiculo2.capacidad_actual += cargaCambiada;
-
-                    cargaCambiada = hallarCargaTotalRuta(clientes, porcion2);
-                    vehiculo2.capacidad_actual -= cargaCambiada;
-                    vehiculo1.capacidad_actual += cargaCambiada;
-                    
-                    
-                    hallarFitness(solucion);
                     solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                     
-                    
+//                    imprimirCasos(vehiculo1.ruta);
+//                    imprimirCasos(vehiculo2.ruta);
+//                    cout<<endl;
                     if(compararFitness(solucion, solMejoradaPropuesta) > 0){
+                        //Prueba
+//                        cout<<solucion.fitnessSolucion<<" "<<solMejoradaPropuesta.fitnessSolucion<<endl;
+                        
                         solMejoradaPropuesta = solucion;
                         encontrado = true;
                     }
@@ -455,31 +374,17 @@ bool LSRealocar(struct Problema& problemita, struct Solucion& solucionActual, st
                     struct Vehiculo & vehiculo1 = solucion.vehiculos[i];
                     struct Vehiculo & vehiculo2 = solucion.vehiculos[j];
 
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorSaque(distancias, vehiculo1, lClientes, pos, cantAdmisibles);
+                    
                     //Sacar l clientes de vehículo 1
                     vector<int> porcion(vehiculo1.ruta.begin()+pos, vehiculo1.ruta.begin()+pos+lClientes);
                     vehiculo1.ruta.erase(vehiculo1.ruta.begin()+pos, vehiculo1.ruta.begin()+pos+lClientes);
 
 
-                    //Actualizar la distancia
-                    reacomodarDistanciaPorIngreso(distancias, vehiculo2, lClientes, nuevaPos, cantAdmisibles2, porcion);
                     //Insertar l clientes en vehículo 2
                     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+nuevaPos, porcion.begin(), porcion.end());
 
 
-                    //Modificar los tiempos totales por cliente
-                    double tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion);
-                    vehiculo1.tiempo_total -= tiempoCambiado;
-                    vehiculo2.tiempo_total += tiempoCambiado;
-
-                    //Modificar las cargas totales
-                    double cargaCambiada = hallarCargaTotalRuta(clientes, porcion);
-                    vehiculo1.capacidad_actual -= cargaCambiada;
-                    vehiculo2.capacidad_actual += cargaCambiada;
                     
-                    
-                    hallarFitness(solucion);
                     solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                     
                     if(compararFitness(solucion, solMejoradaPropuesta) > 0){
@@ -511,8 +416,7 @@ void TInsertarVehiculo(vector <vector <double>>& distancias, struct Vehiculo &ve
 
     int cantAdmisibles = vehiculo.ruta.size() - lClientes + 1;
     int pos = rand()%cantAdmisibles;
-    //Actualizar la distancia
-    reacomodarDistanciaPorSaque(distancias, vehiculo, lClientes, pos, cantAdmisibles);
+    
     //Sacar l clientes
     vector<int> porcion(vehiculo.ruta.begin()+pos, vehiculo.ruta.begin()+pos+lClientes);
     vehiculo.ruta.erase(vehiculo.ruta.begin()+pos, vehiculo.ruta.begin()+pos+lClientes);
@@ -521,66 +425,9 @@ void TInsertarVehiculo(vector <vector <double>>& distancias, struct Vehiculo &ve
     
     int nuevaPos= rand()%cantAdmisibles;
     if(nuevaPos >= pos) nuevaPos++;
-    //Actualizar la distancia
-    reacomodarDistanciaPorIngreso(distancias, vehiculo, lClientes, nuevaPos, cantAdmisibles, porcion);
+    
     //Insertar l clientes
     vehiculo.ruta.insert(vehiculo.ruta.begin()+nuevaPos, porcion.begin(), porcion.end());
-}
-//
-void reacomodarDistanciaPorSaque(const vector <vector <double>>& distancias, 
-                                 struct Vehiculo &vehiculo, int lClientes,
-                                 int pos, int cantAdmisibles){
-    int antesCorte, despuesCorte;
-    //Restar las distancias de los arcos por eliminar
-    if(pos == 0){
-        antesCorte = POSINICIO;
-    }
-    else{
-        antesCorte = vehiculo.ruta[pos-1];
-    }
-    int pppp = vehiculo.ruta[pos];
-    double pa = hallarDistancia(distancias, antesCorte, pppp);
-    vehiculo.distancia_total -= pa;
-    
-    if(pos == cantAdmisibles - 1){
-        despuesCorte = POSINICIO;
-    }
-    else{
-        despuesCorte = vehiculo.ruta[pos + lClientes];
-        
-    }
-    pppp = vehiculo.ruta[pos + lClientes - 1];
-    double pe = hallarDistancia(distancias, pppp, despuesCorte);
-    vehiculo.distancia_total -= pe;
-    
-    //Sumar la distancia del arco generado
-    double po = hallarDistancia(distancias, antesCorte, despuesCorte);
-    vehiculo.distancia_total += po;
-}
-//
-void hallarFitness(struct Solucion &solucionActual){
-    vector <Vehiculo>& solucion = solucionActual.vehiculos;
-    int i;
-    double tiempoAcumulado = 0;
-    double tiempo;
-    double carga;
-    int cliPorVeh;
-    for(i = 0; i < solucion.size();i++){
-        tiempo = hallarRealTiempoTotal(solucion[i]);
-        carga = solucion[i].capacidad_actual;
-        cliPorVeh = solucion[i].ruta.size();
-        if(carga > CARGAMAX or  cliPorVeh > CLI_POR_VEH or  tiempo > TIEMPOMAX){
-            solucionActual.fitnessSolucion = PEOR_FITNESS;
-            return;
-        }
-        
-        tiempoAcumulado += tiempo;
-    }
-    solucionActual.fitnessSolucion = tiempoAcumulado/i;
-}
-
-double hallarRealTiempoTotal(struct Vehiculo &vehiculo){
-    return vehiculo.tiempo_total + vehiculo.distancia_total / VEL_PROM;
 }
 //
 int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2){
@@ -618,24 +465,20 @@ double hallarFitness1(struct Problema &problemita,
     int i;
     double tiempoAcumulado = 0;
     double cargaAcumulada = 0;
-    double distanciaAcumulada = 0;
     double tiempo, distancia, tiempoReal;
     double carga;
     int cliPorVeh;
     for(i = 0; i < solucion.size();i++){
-        tiempo =  hallarTiempoRuta(problemita.distancias,problemita.clientes,solucion[i].ruta);
-        distancia = hallarDistanciaRuta(problemita.distancias, solucion[i].ruta);
-        tiempoReal = tiempo + distancia/VEL_PROM;
+        tiempoReal =  hallarTiempoRuta(problemita.distancias,problemita.clientes,solucion[i].ruta);
         carga = hallarCargaTotalRuta(problemita.clientes, solucion[i].ruta);
         cargaAcumulada += carga;
         tiempoAcumulado += tiempoReal;
         cliPorVeh = solucion[i].ruta.size();
         if(carga > CARGAMAX or cliPorVeh > CLI_POR_VEH or  tiempo > TIEMPOMAX){
             return PEOR_FITNESS;
-            
         }
     }
-    return (tiempoAcumulado + distanciaAcumulada/ VEL_PROM)/i;
+    return (tiempoAcumulado)/i;
 }
 //
 double hallarTiempoRuta(vector<vector<double>> &distancias,
@@ -668,29 +511,6 @@ double hallarTiempoPorClienteRuta(vector<struct Cliente> &clientes, const vector
     return tiempo;
 }
 //
-void reacomodarDistanciaPorIngreso(const vector <vector <double>>& distancias, 
-        struct Vehiculo &vehiculo, int lClientes, int nuevaPos, int cantAdmisibles, const vector <int> &porcion){
-    int antesCorte, despuesCorte;
-    //Sumar las distancias de los arcos por ingresar
-    if(nuevaPos == 0){
-        antesCorte = POSINICIO;
-    }
-    else{
-        antesCorte = vehiculo.ruta[nuevaPos-1];
-    }
-    vehiculo.distancia_total += hallarDistancia(distancias, antesCorte, porcion[0]);
-    
-    if(nuevaPos == vehiculo.ruta.size()){
-        despuesCorte = POSINICIO;
-    }
-    else{
-        despuesCorte = vehiculo.ruta[nuevaPos];
-    }
-    vehiculo.distancia_total += hallarDistancia(distancias, porcion[lClientes - 1], despuesCorte);
-    //Restar la distancia del arco eliminado
-    vehiculo.distancia_total -= hallarDistancia(distancias, antesCorte, despuesCorte);
-}
-//
 void shaking(Solucion &solucion, int k, Problema &problemita){
     srand(time(NULL));
       // Perturbar la solución actual para diversificación
@@ -703,14 +523,12 @@ void shaking(Solucion &solucion, int k, Problema &problemita){
             case 0:
                 // Insertar l clientes en la misma ruta
                 TInsertar(problemita,solucion,ele);
-                hallarFitness(solucion);
                 solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                 cout<<solucion.fitnessSolucion<<endl;
                 break;
             case 1: {
                 // Realocar l clientes entre rutas diferentes
                 TRealocar(problemita, solucion,ele);
-                hallarFitness(solucion);
                 solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                 cout<<solucion.fitnessSolucion<<endl;
                 break;
@@ -718,7 +536,6 @@ void shaking(Solucion &solucion, int k, Problema &problemita){
             case 2: {
                 // Intercambiar l clientes entre rutas diferentes
                 TIntercambiar(problemita,solucion,ele);
-                hallarFitness(solucion);
                 solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
                 cout<<solucion.fitnessSolucion<<endl;
                 break;
@@ -726,22 +543,13 @@ void shaking(Solucion &solucion, int k, Problema &problemita){
         }
     }
     // Recalcular fitness después del shaking
-    hallarFitness(solucion);
     solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
 }
 //
 bool posibleSolucion(const struct Solucion &solucion){
-    //Falta determinar si una solución es admisible
-    //Cada vehículo hace, a lo más, un ruta
     if(solucion.fitnessSolucion == PEOR_FITNESS ) return false;
     return true;
 }
-
-
-
-
-
-
 //
 double hallarCargaTotalRuta(vector<struct Cliente> &clientes, const vector<int> ruta){
     int demanda=0;
@@ -750,13 +558,6 @@ double hallarCargaTotalRuta(vector<struct Cliente> &clientes, const vector<int> 
     }
     return demanda;
 }
-
-
-//
-
-
-
-
 //
 void TRealocar(struct Problema& problemita, struct Solucion& solucion, int lClientes){
     int v1, v2; //Por random
@@ -766,11 +567,12 @@ void TRealocar(struct Problema& problemita, struct Solucion& solucion, int lClie
         if(v1!=v2 and solucion.vehiculos[v1].ruta.size() - lClientes >= 0){
             TRealocarVehiculo(problemita.distancias, problemita.clientes, 
                               solucion.vehiculos[v1], solucion.vehiculos[v2], lClientes);
+            solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
             break;
         }
     }
 }
-
+//
 void TRealocarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
         struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes){
     //Para ejecutar esta parte se debe corroborar que vehiculo1.ruta.size() - lClientes > 0
@@ -778,8 +580,6 @@ void TRealocarVehiculo(vector <vector <double>>& distancias, vector<struct Clien
     int pos = rand()%cantAdmisibles;
     
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorSaque(distancias, vehiculo1, lClientes, pos, cantAdmisibles);
     //Sacar l clientes de vehículo 1
     vector<int> porcion(vehiculo1.ruta.begin()+pos, vehiculo1.ruta.begin()+pos+lClientes);
     vehiculo1.ruta.erase(vehiculo1.ruta.begin()+pos, vehiculo1.ruta.begin()+pos+lClientes);
@@ -788,21 +588,10 @@ void TRealocarVehiculo(vector <vector <double>>& distancias, vector<struct Clien
     cantAdmisibles = vehiculo2.ruta.size() + 1;
     int nuevaPos= rand()%cantAdmisibles;
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorIngreso(distancias, vehiculo2, lClientes, nuevaPos, cantAdmisibles, porcion);
     //Insertar l clientes en vehículo 2
     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+nuevaPos, porcion.begin(), porcion.end());
     
     
-    //Modificar los tiempos totales por cliente
-    double tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion);
-    vehiculo1.tiempo_total -= tiempoCambiado;
-    vehiculo2.tiempo_total += tiempoCambiado;
-    
-    //Modificar las cargas totales
-    double cargaCambiada = hallarCargaTotalRuta(clientes, porcion);
-    vehiculo1.capacidad_actual -= cargaCambiada;
-    vehiculo2.capacidad_actual += cargaCambiada;
 }
 //
 void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int lClientes){
@@ -813,6 +602,7 @@ void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int l
         if(v1!=v2 and solucion.vehiculos[v1].ruta.size() - lClientes >= 0 and solucion.vehiculos[v2].ruta.size() - lClientes >= 0){
             TIntercambiarVehiculo(problemita.distancias, problemita.clientes, 
                               solucion.vehiculos[v1], solucion.vehiculos[v2], lClientes);
+            solucion.fitnessSolucion = hallarFitness1(problemita, solucion.vehiculos);
             break;
         }
     }
@@ -825,8 +615,6 @@ void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct C
     int cantAdmisibles = vehiculo1.ruta.size() - lClientes + 1;
     int pos1 = rand()%cantAdmisibles;
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorSaque(distancias, vehiculo1, lClientes, pos1, cantAdmisibles);
     //Sacar l clientes de vehículo 1
     vector<int> porcion1(vehiculo1.ruta.begin()+pos1, vehiculo1.ruta.begin()+pos1+lClientes);
     vehiculo1.ruta.erase(vehiculo1.ruta.begin()+pos1, vehiculo1.ruta.begin()+pos1+lClientes);
@@ -834,8 +622,6 @@ void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct C
     int cantAdmisibles2 = vehiculo2.ruta.size() - lClientes + 1;
     int pos2 = rand()%cantAdmisibles2;
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorSaque(distancias, vehiculo2, lClientes, pos2, cantAdmisibles2);
     //Sacar l clientes de vehículo 2
     vector<int> porcion2(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
     vehiculo2.ruta.erase(vehiculo2.ruta.begin()+pos2, vehiculo2.ruta.begin()+pos2+lClientes);
@@ -843,36 +629,15 @@ void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct C
     
     
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorIngreso(distancias, vehiculo1, lClientes, pos1, cantAdmisibles-1, porcion2);
     //Insertar l clientes en vehículo 1
     vehiculo1.ruta.insert(vehiculo1.ruta.begin()+pos1, porcion2.begin(), porcion2.end());
     
     
     
-    //Actualizar la distancia
-    reacomodarDistanciaPorIngreso(distancias, vehiculo2, lClientes, pos2, cantAdmisibles2-1, porcion1);
     //Insertar l clientes en vehículo 2
     vehiculo2.ruta.insert(vehiculo2.ruta.begin()+pos2, porcion1.begin(), porcion1.end());
     
     
-    //Modificar los tiempos totales por cliente
-    double tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion1);
-    vehiculo1.tiempo_total -= tiempoCambiado;
-    vehiculo2.tiempo_total += tiempoCambiado;
-    
-    tiempoCambiado = hallarTiempoPorClienteRuta(clientes, porcion2);
-    vehiculo2.tiempo_total -= tiempoCambiado;
-    vehiculo1.tiempo_total += tiempoCambiado;
-    
-    //Modificar las cargas totales
-    double cargaCambiada = hallarCargaTotalRuta(clientes, porcion1);
-    vehiculo1.capacidad_actual -= cargaCambiada;
-    vehiculo2.capacidad_actual += cargaCambiada;
-    
-    cargaCambiada = hallarCargaTotalRuta(clientes, porcion2);
-    vehiculo2.capacidad_actual -= cargaCambiada;
-    vehiculo1.capacidad_actual += cargaCambiada;
     
 }
 
@@ -892,11 +657,7 @@ void cambiarVecindario(struct Problema &problemita,
         k++;
     }
 }
-
-
-
-
-
+//
 struct Solucion busquedaLocalVehiculosRealocar( struct Problema &problemita, 
         struct Solucion &solucion, int lClientes){
     struct Solucion solPropuesta = solucion;
@@ -908,7 +669,7 @@ struct Solucion busquedaLocalVehiculosRealocar( struct Problema &problemita,
 //    }
     return solPropuesta;
 }
-
+//
 struct Solucion busquedaLocalVehiculosIntercambiar( struct Problema &problemita, 
         struct Solucion &solucion, int lClientes){
     struct Solucion solPropuesta = solucion;

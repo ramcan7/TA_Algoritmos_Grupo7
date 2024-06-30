@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     // Resolucion del Problema
     GVNS(problemita);
     // Impresion de Solucion
-    imprimirSolucion(problemita.solucion,"Solucion.txt");
+    imprimirSolucion(problemita, problemita.solucion,"Solucion.txt");
     
     return 0;
 }

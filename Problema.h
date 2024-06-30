@@ -18,7 +18,7 @@ using namespace std;
 #define CANT_VECHICULOS 5
 #define CARGAMAX 400
 #define TIEMPOMAX 3000
-#define VEL_PROM 2 // En hm/min //Falta definir la escala del tiempo y distancia
+#define VEL_PROM 2 // En hm/min
 
 struct Problema {
     vector<vector<double>> distancias; // Matriz de distancias entre clientes

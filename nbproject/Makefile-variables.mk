@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=MinGW-Windows
 CND_ARTIFACT_DIR_Debug=dist/Debug/MinGW-Windows
-CND_ARTIFACT_NAME_Debug=reposteameestapablo_vxddd
-CND_ARTIFACT_PATH_Debug=dist/Debug/MinGW-Windows/reposteameestapablo_vxddd
+CND_ARTIFACT_NAME_Debug=ta_algoritmos_avanzados_g7
+CND_ARTIFACT_PATH_Debug=dist/Debug/MinGW-Windows/ta_algoritmos_avanzados_g7
 CND_PACKAGE_DIR_Debug=dist/Debug/MinGW-Windows/package
-CND_PACKAGE_NAME_Debug=reposteameestapablovxddd.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/MinGW-Windows/package/reposteameestapablovxddd.tar
+CND_PACKAGE_NAME_Debug=taalgoritmosavanzadosg7.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/MinGW-Windows/package/taalgoritmosavanzadosg7.tar
 # Release configuration
 CND_PLATFORM_Release=MinGW-Windows
 CND_ARTIFACT_DIR_Release=dist/Release/MinGW-Windows
-CND_ARTIFACT_NAME_Release=reposteameestapablo_vxddd
-CND_ARTIFACT_PATH_Release=dist/Release/MinGW-Windows/reposteameestapablo_vxddd
+CND_ARTIFACT_NAME_Release=ta_algoritmos_avanzados_g7
+CND_ARTIFACT_PATH_Release=dist/Release/MinGW-Windows/ta_algoritmos_avanzados_g7
 CND_PACKAGE_DIR_Release=dist/Release/MinGW-Windows/package
-CND_PACKAGE_NAME_Release=reposteameestapablovxddd.tar
-CND_PACKAGE_PATH_Release=dist/Release/MinGW-Windows/package/reposteameestapablovxddd.tar
+CND_PACKAGE_NAME_Release=taalgoritmosavanzadosg7.tar
+CND_PACKAGE_PATH_Release=dist/Release/MinGW-Windows/package/taalgoritmosavanzadosg7.tar
 #
 # include compiler specific variables
 #
