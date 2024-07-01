@@ -15,25 +15,16 @@
 #include "GRASP.h"     
 #define alfa 0.3
 #define NO_ENCONTRADO -1
+#define PEOR_FITNESS 9999
 #define ITERACIONES 1000
 
 using namespace std;
 
-//
-
-bool comparaTiempo(nodo a, nodo b){
-    return a.tiempo < b.tiempo;
-}
-
-bool comparaDistancia(nodo a, nodo b){
-    return a.distancia < b.distancia;
-}
-
-bool compara(nodo a, nodo b){
+bool compara(Nodo a, Nodo b){
     return a.distancia < b.distancia or (a.distancia == b.distancia and a.tiempo < b.tiempo);
 }
 
-int verifica(vector <nodo>ciudades,double maxrcl){
+int verifica(vector <Nodo>ciudades,double maxrcl){
     int cont=0;
     for(int i=0;i<ciudades.size();i++) 
         if(maxrcl>=ciudades[i].distancia)
@@ -41,102 +32,88 @@ int verifica(vector <nodo>ciudades,double maxrcl){
     return cont;    
 }
 
-struct Vehiculo minruta(int ini,int fin, vector<vector<double>> &distancias, vector<Cliente> &clientes){
-    int beta,tau,ciudad,indmax,inda;
-    double maxrcl;
-    double total,min=999999;
-    struct Vehiculo mejorVehiculo{};
-    mejorVehiculo.velocidad = VEL_PROM;
-    mejorVehiculo.distancia_total = min;
-    
-    //int ayuda = 0;
-    for(int k=0;k<ITERACIONES;k++){
-        ciudad=ini;
-        total = 0;
-
-        struct Vehiculo vehiculo{};
-        vehiculo.velocidad = VEL_PROM;
-        vehiculo.capacidad_max = CARGAMAX;
-        while(1){
-            vector<nodo>vecinos;
-            nodo paso;
-            //a que clientes puede ir
-            for(int i=0;i<distancias.size();i++){
-                if(distancias[ciudad][i]>0 and !clientes[i].atendido){
-                    paso.distancia=distancias[ciudad][i];
-                    paso.punto=i;
-                    vecinos.push_back(paso);
-                }
-            }    
-            if(!vecinos.empty()){
-                do{
-                    sort(vecinos.begin(),vecinos.end(),compara);
-                    beta = vecinos[0].distancia;
-                    tau = vecinos[vecinos.size()-1].distancia;
-                    maxrcl = round(beta + alfa*(tau-beta));
-                    indmax = verifica(vecinos,maxrcl);
-                    srand(time(NULL));
-                    inda = rand()%indmax;
-                    struct nodo nd;
-                    nd = vecinos[inda];
-                    struct Cliente cliente;
-                    cliente = clientes[vecinos[inda].punto];
-                    if(cliente.id!=-1 and cliente.demanda + vehiculo.capacidad_actual <= vehiculo.capacidad_max)
-                    {
-                        if(cliente.tiempo_servicio  +vehiculo.tiempo_total <= TIEMPOMAX){ 
-                            clientes[vecinos[inda].punto].atendido=true;
-                            ciudad = vecinos[inda].punto;
-                            vehiculo.ruta.push_back(vecinos[inda].punto);
-                            vehiculo.capacidad_actual += clientes[vecinos[inda].punto].demanda;
-                            vehiculo.distancia_total += vecinos[inda].distancia;
-                            vehiculo.tiempo_total += clientes[vecinos[inda].punto].tiempo_servicio;
-                            break;
-                        }
-                    }
-                    else vecinos.erase(vecinos.begin()+inda);
-                    if(vecinos.empty()) break;
-                }while(true);
-                
-            }
-            //if(vehiculo.ruta.size()>=(clientes.size()))
-            if(ciudad==fin) {
-                //vehiculo.ruta.erase(vehiculo.ruta.begin()+vehiculo.ruta.size()-1);
-                break;
-            }
-            if(vecinos.empty()){
-                //cout <<"No se encontro solución" <<endl;
-                //vehiculo.tiempo_total=0;
-                break;
-            }
-        }    
-        if(vehiculo.distancia_total<mejorVehiculo.distancia_total){
-            mejorVehiculo = vehiculo;
-        } 
-        for(int i = 0; i < vehiculo.ruta.size();i++){
-            clientes[vehiculo.ruta[i]].atendido = false;
+void solucionInicialGrasp(struct Problema &problemita, struct Solucion &solucionAux){
+    struct Solucion mejorSolucion;
+    mejorSolucion.vehiculos = problemita.vehiculos;
+    mejorSolucion.fitness = PEOR_FITNESS;
+    for(int k = 0; k < ITERACIONES; k++){
+        // Declaracion & Inicializacion de Variables
+        int cantVehi = problemita.vehiculos.size(),posCercana,i,partida = POSINICIO;
+        vector<struct Cliente> clientesAux = problemita.clientes;
+        solucionAux.vehiculos = problemita.vehiculos;
+        // Eliminación del punto de partida
+        clientesAux.erase(clientesAux.begin() + POSINICIO);
+        //Selección de los primeros pedidos atendidos
+        for(i = 0;i < cantVehi;i++){
+            posCercana = asignaClienteRCL(solucionAux.vehiculos[i], problemita.distancias, clientesAux, partida);
+            if(posCercana == NO_ENCONTRADO) break;
+            solucionAux.vehiculos[i].ruta.push_back(posCercana);
         }
-        if(k%50==0)
+        //Selección de los siguientes Nodos atendidos
+        for(i = 0;true;i++){
+            partida = solucionAux.vehiculos[i].ruta[solucionAux.vehiculos[i].ruta.size()-1];
+            posCercana = asignaClienteRCL(solucionAux.vehiculos[i], problemita.distancias, clientesAux, partida);
+            if(posCercana == NO_ENCONTRADO) break;
+            solucionAux.vehiculos[i].ruta.push_back(posCercana);
+            if(i + 1 == cantVehi) i = -1;
+        }
+        solucionAux.fitness = hallarFitness1(problemita,solucionAux.vehiculos);
+        if(compararFitness(mejorSolucion, solucionAux)<0){
+            mejorSolucion = solucionAux;
+        }
+        if(k%100==0)
             cout << "Iteración: " << k << endl;
     }
-    mejorVehiculo.distancia_total += distancias[mejorVehiculo.ruta[mejorVehiculo.ruta.size()-1]][POSINICIO];
-    return mejorVehiculo;
+    solucionAux = mejorSolucion;
 }
 
-
-void actualizaClientesDisponibles(vector<struct Cliente> &clientes, struct Vehiculo &vehiculo){
-    for(int i = 0; i < vehiculo.ruta.size(); i++){
-        clientes[vehiculo.ruta[i]].atendido = true;
+int asignaClienteRCL(struct Vehiculo &vehiculo, vector<vector<double>> &distancias, vector<Cliente> &clientes, int partida){
+    int indmax,inda;
+    double beta,tau, maxrcl;
+    vector<Nodo> candidatos;
+    Nodo paso;
+    
+    //selecciona a los clientes donde se puede ir (tdavia no han sido atentidos)
+    for(int i=0;i<distancias.size();i++){
+        if(distancias[partida][i]>0 and !clientes[i].atendido){
+            paso.distancia=distancias[partida][i];
+            paso.tiempo = clientes[i].tiempo_servicio;
+            paso.punto=i;
+            candidatos.push_back(paso);
+        }
+    }    
+    
+    //si hay clientes a los que se puede ir
+    if(!candidatos.empty()){
+        //hasta que encuentre un cliente que cumpla las condiciones del ejercicio
+        do{
+            //ordena candidatos
+            sort(candidatos.begin(),candidatos.end(),compara);
+            beta = candidatos[0].distancia;
+            tau = candidatos[candidatos.size()-1].distancia;
+            maxrcl = round(beta + alfa*(tau-beta));
+            indmax = verifica(candidatos,maxrcl);
+            srand(time(NULL));
+            //se elige randonomicamente uno de los candidatos dentro del rango
+            inda = rand()%indmax;
+            struct Cliente cliente = clientes[candidatos[inda].punto];
+            Nodo candidato = candidatos[inda];
+            if(cliente.id!=-1 and cliente.demanda + vehiculo.capacidad_actual <= vehiculo.capacidad_max)
+            {
+                if(cliente.tiempo_servicio + vehiculo.tiempo_total <= TIEMPOMAX){ 
+                    clientes[candidatos[inda].punto].atendido=true;
+                    vehiculo.capacidad_actual += clientes[candidatos[inda].punto].demanda;
+                    vehiculo.distancia_total += candidatos[inda].distancia;
+                    vehiculo.tiempo_total += clientes[candidatos[inda].punto].tiempo_servicio;
+                    return candidatos[inda].punto;
+                }
+            }
+            else candidatos.erase(candidatos.begin()+inda);
+            //si ningun cliente cumple las condiciones, finaliza busqueda
+            if(candidatos.empty()) break;
+        }while(true);
     }
-}
-
-void solucionInicialGrasp(struct Problema &problemita, struct Solucion &solucionAux){
-    //acá los datos de vehículo de SolucionAux están inicializados
-    solucionAux.vehiculos = problemita.vehiculos;
-    for(int i = 0; i < solucionAux.vehiculos.size(); i++){
-        solucionAux.vehiculos[i] = minruta(POSINICIO, POSINICIO, problemita.distancias, problemita.clientes);
-        actualizaClientesDisponibles(problemita.clientes, solucionAux.vehiculos[i]);
-    }
-    solucionAux.fitness = hallarFitness1(problemita, solucionAux.vehiculos);
-    problemita.solucion = solucionAux;
+    
+    return NO_ENCONTRADO;
 }
 

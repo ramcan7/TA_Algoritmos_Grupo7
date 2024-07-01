@@ -94,7 +94,7 @@ int masCercanoNodo(vector<vector<double>> &distancias, vector<struct Cliente> &c
         distMin = hallarDistancia(distancias,partida,i);
         for(i = 1; i < clientesAux.size(); i++){
             double dist = hallarDistancia(distancias,partida,i);
-            if(partida!=i and dist < distMin){
+            if(dist>0 and dist < distMin){
                 distMin = dist;
                 posI = i;
             }

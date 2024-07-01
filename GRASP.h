@@ -16,16 +16,15 @@
 #include <vector>
 using namespace std;
 
-struct nodo{
+struct Nodo{
+    double tiempo;
+    double distancia;
     int punto;
-    int distancia;
-    int tiempo;
 };
 
 void solucionInicialGrasp(struct Problema &problemita, struct Solucion &solucionAux);
-struct Vehiculo minruta(int ini,int fin, vector<vector<double>> &distancias, vector<Cliente> &clientes);
-int verifica(vector <nodo>ciudades,double maxrcl);
-bool compara(nodo a, nodo b);
-void actualizaClientesDisponibles(vector<struct Cliente> &clientes, struct Vehiculo &vehiculo);
+int verifica(vector <Nodo>ciudades,double maxrcl);
+bool compara(Nodo a, Nodo b);
+int asignaClienteRCL(struct Vehiculo &vehiculo, vector<vector<double>> &distancias, vector<Cliente> &clientes, int partida);
 #endif /* GRASP_H */
 
