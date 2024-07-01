@@ -21,7 +21,14 @@ int main(int argc, char** argv) {
     cargarClientes(problemita.clientes,"Clientes.txt");
     cargarVehiculos(problemita.vehiculos);
     // Resolucion del Problema
-    GVNS(problemita);
+    
+    //solucionInicial = VecinoMasCercano
+    cout << "Solucion Inicial: Vecino Mas Cercano" << endl;
+    GVNS(problemita, 1);
+    
+    //solucionInicial = Grasp
+    cout << "Solucion Inicial: GRASP" << endl;
+    GVNS(problemita, 2);
     
     return 0;
 }

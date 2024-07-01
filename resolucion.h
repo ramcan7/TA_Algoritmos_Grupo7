@@ -13,7 +13,7 @@
                 /*  - / > [ Declaracion de Funciones ] < / -  */
                   /*  - / > [ Funciones en main() ] < / -  */
 
-void GVNS(struct Problema &);
+void GVNS(struct Problema &, int opcion);
 
               /*  - / > [ Funciones de Orden Principal ] < / -  */
 

@@ -16,7 +16,7 @@
 #define alfa 0.3
 #define NO_ENCONTRADO -1
 #define PEOR_FITNESS 9999
-#define ITERACIONES 1000
+#define ITERACIONES 1500
 
 using namespace std;
 
@@ -57,14 +57,15 @@ void solucionInicialGrasp(struct Problema &problemita, struct Solucion &solucion
             solucionAux.vehiculos[i].ruta.push_back(posCercana);
             if(i + 1 == cantVehi) i = -1;
         }
-        solucionAux.fitness = hallarFitness1(problemita,solucionAux.vehiculos);
+        solucionAux.fitness = hallarFitness(problemita,solucionAux);
         if(compararFitness(mejorSolucion, solucionAux)<0){
             mejorSolucion = solucionAux;
         }
-        if(k%100==0)
-            cout << "Iteración: " << k << endl;
+        if(k%1000==0)
+            cout << "  Iteración: " << k << endl;
     }
     solucionAux = mejorSolucion;
+    cout<<setw(12)<<'['<<solucionAux.fitness<<']'<<endl;
 }
 
 int asignaClienteRCL(struct Vehiculo &vehiculo, vector<vector<double>> &distancias, vector<Cliente> &clientes, int partida){
@@ -97,10 +98,10 @@ int asignaClienteRCL(struct Vehiculo &vehiculo, vector<vector<double>> &distanci
             //se elige randonomicamente uno de los candidatos dentro del rango
             inda = rand()%indmax;
             struct Cliente cliente = clientes[candidatos[inda].punto];
-            Nodo candidato = candidatos[inda];
+            //Nodo candidato = candidatos[inda];
             if(cliente.id!=-1 and cliente.demanda + vehiculo.capacidad_actual <= vehiculo.capacidad_max)
             {
-                if(cliente.tiempo_servicio + vehiculo.tiempo_total <= TIEMPOMAX){ 
+                if(cliente.tiempo_servicio + vehiculo.tiempo_total <= MAX_TIEMPO){ 
                     clientes[candidatos[inda].punto].atendido=true;
                     vehiculo.capacidad_actual += clientes[candidatos[inda].punto].demanda;
                     vehiculo.distancia_total += candidatos[inda].distancia;

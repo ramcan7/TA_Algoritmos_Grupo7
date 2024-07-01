@@ -6,6 +6,8 @@
 [/] */
 
 #include "Funciones Auxiliares.h"
+#include <string>
+using namespace std;
 #define DIMLINEA 68
 
                 /*  - / > [ Definicion de Funciones ] < / -  */
@@ -79,9 +81,13 @@ void cargarVehiculos(vector <struct Vehiculo> &vehiculos){
 }
 // Modulo de Impresion de 'Solucion'
 void imprimirSolucion(struct Problema &problemita, struct Solucion& solucion,
-                      const char *nombArch){
+                      const char *nombArch, int opcion){
+    string nombreArchivo;
+    if(opcion==1) nombreArchivo = "NN";
+    else nombreArchivo = "GRASP";
+    nombreArchivo.append(nombArch);
     // Apertura de Archivo
-    ofstream arch = abrirArchivo_OFS(nombArch);
+    ofstream arch = abrirArchivo_OFS(nombreArchivo.c_str());
     // Inicializacion de Elementos
     arch<<fixed<<setprecision(2);
     // Proceso de Impresion de la Solucion

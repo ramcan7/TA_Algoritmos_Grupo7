@@ -6,6 +6,7 @@
 [/] */
 
 #include "resolucion.h"
+#include "GRASP.h"
 #define L_MIN 1                         // Minimo de Elementos Tomados para una Modificacion
 #define L_MAX 2                         // Maximo de Elementos Tomados para una Modificacion
 #define K_MIN 3                         // Minimo Numero de Agitaciones a Solucion
@@ -20,21 +21,22 @@
                   /*  - / > [ Funciones en main() ] < / -  */
 
 // General Variable Neighborhood Search
-void GVNS(struct Problema &problemita){
+void GVNS(struct Problema &problemita, int opcion){
     // Declaracion de Variables
     struct Solucion solucionAux,x_best;
     int t = 0,t_best = 0;
     // Inicializacion de Elementos
     srand(time(NULL));
     cout<<fixed<<setprecision(2);
-    // Solucion 'Heuristica'
-    solucionInicial(problemita,solucionAux);
-    imprimirSolucion(problemita,solucionAux,"SolucionIni.txt");
+    // Solucion 'Heuristica' Vecino Más Cercano - Nearest Neighbor
+    if(opcion==1) solucionInicial(problemita,solucionAux);
+    else solucionInicialGrasp(problemita, solucionAux);
+    imprimirSolucion(problemita,solucionAux,"SolucionIni.txt", opcion);
     // Solucion Optimizada por 'Variable Neighborhood Descent'
     cout<<"// La primera optimizacion puede tardar debido a que"<<endl;
     cout<<"// la solucion inicial es altamente reducible.."<<endl;
     VND(problemita,solucionAux);
-    imprimirSolucion(problemita,solucionAux,"SolucionVND.txt");
+    imprimirSolucion(problemita,solucionAux,"SolucionVND.txt", opcion);
     cout<<setw(18)<<"Nuevo mejor!"<<endl;
     cout<<setw(9)<<'['<<solucionAux.fitness<<']'<<endl;
     // Proceso de Mejora por GNVS
@@ -65,7 +67,7 @@ void GVNS(struct Problema &problemita){
     } while (t < T_MAX);
     // Solucion del Problema [Optimizada por 'General Variable Neighborhood Search']
     problemita.solucion = x_best;
-    imprimirSolucion(problemita,x_best,"SolucionGVNS.txt");
+    imprimirSolucion(problemita,x_best,"SolucionGVNS.txt", opcion);
     cout<<endl<<"MEJOR SOLUCION OBTENIDA: "<<problemita.solucion.fitness<<endl;
 }
 

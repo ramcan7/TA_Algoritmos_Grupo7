@@ -23,7 +23,7 @@ void cargarClientes(vector<struct Cliente> &,const char *);
 
 void cargarVehiculos(vector <struct Vehiculo> &);
 
-void imprimirSolucion(struct Problema &,struct Solucion &,const char *);
+void imprimirSolucion(struct Problema &,struct Solucion &,const char *, int);
 
 void imprimirRuta(ofstream &,struct Problema &,struct Vehiculo &);
 
