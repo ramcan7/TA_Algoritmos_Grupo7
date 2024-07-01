@@ -11,22 +11,23 @@
 #include <algorithm>
 #include <random>
 #include <ctime>
+#include <chrono>
 using namespace std;
 #include "Cliente.h"
 #include "Solucion.h"
-#define POSINICIO 2
-#define CANT_VECHICULOS 5
-#define CARGAMAX 400
-#define TIEMPOMAX 3000
-#define VEL_PROM 2 // En hm/min
+#define POSINICIO 2                     // POSICION DE INICIAL DE PARTIDA DE LOS VEHICULOS EN MATRIZ
+#define CANT_VECHICULOS 5               // CANTIDAD DE VEHICULOS
+#define MAX_ATENCIONES 100              // LIMITE DE ATENCIONES POR VEHICULO
+#define MAX_CARGA 400                   // LIMITE DE CARGA POR VEHICULO
+#define MAX_TIEMPO 3000                 // LIMITE DE TIEMPO DE DEMORA DE RUTA POR VEHICULO
+#define VEL_PROM 2                      // VELOCIDAD PROMEDIO DE VEHICULO [Se toma en hm/min]
 
+// Definicion de 'Problema'
 struct Problema {
-    vector<vector<double>> distancias; // Matriz de distancias entre clientes
-    vector<struct Cliente> clientes;
-    vector<struct Vehiculo> vehiculos;
-    struct Solucion solucion;
+    vector<vector<double>> distancias;  // Matriz de distancias entre clientes
+    vector<struct Cliente> clientes;    // Vector de 'Clientes'
+    vector<struct Vehiculo> vehiculos;  // Vector de 'Vehiculos'
+    struct Solucion solucion;           // 'Solucion' del Problema
 };
-
-
 
 #endif /* PROBLEMA_H */

@@ -11,67 +11,62 @@
 
 
                 /*  - / > [ Declaracion de Funciones ] < / -  */
+                  /*  - / > [ Funciones en main() ] < / -  */
 
-void GVNS(struct Problema &, int);
+void GVNS(struct Problema &);
 
-void solucionInicial(struct Problema &, struct Solucion&);
+              /*  - / > [ Funciones de Orden Principal ] < / -  */
 
-int masCercanoNodo(vector<vector<double>> &, vector<struct Cliente> &, int);
+void solucionInicial(struct Problema &,struct Solucion &);
 
+void VND(struct Problema &,struct Solucion &);
 
+void shaking(Solucion &,int,struct Problema &);
 
-void actualizarRegistrosDeSolucion(vector<vector<double>> &,
-                                   vector<struct Cliente> &,
-                                   struct Solucion &);
+void cambiarVecindario(struct Problema &,struct Solucion &,
+                       struct Solucion &,struct Solucion &,int &,int,int &);
 
+             /*  - / > [ Funciones de Orden Secundario ] < / -  */
+
+int masCercanoNodo(vector<vector<double>> &,vector<struct Cliente> &,int);
+
+bool LSInsertar(struct Problema &, struct Solucion &,struct Solucion &, int);
+
+bool LSIntercambiar(struct Problema &,struct Solucion &,struct Solucion &,int);
+
+bool LSRealocar(struct Problema &,struct Solucion &,struct Solucion &,int);
+
+void TInsertar(struct Problema &,struct Solucion &,int);
+
+void TInsertarVehiculo(vector <vector <double>> &,struct Vehiculo &,int);
+
+void TIntercambiar(struct Problema &,struct Solucion &,int);
+
+void TIntercambiarVehiculo(vector <vector <double>> &,vector<struct Cliente> &,
+                           struct Vehiculo &,struct Vehiculo &,int);
+
+void TRealocar(struct Problema &,struct Solucion &,int);
+
+void TRealocarVehiculo(vector <vector <double>> &,vector<struct Cliente> &,
+                       struct Vehiculo &,struct Vehiculo &,int lClientes);
+
+              /*  - / > [ Funciones de Orden Derivado ] < / -  */
+
+bool posibleSolucion(const struct Solucion &);
 
 double hallarDistancia(const vector<vector<double>> &,int,int);
 
-void VND(struct Problema &, struct Solucion &);
+double hallarFitness(struct Problema &,struct Solucion &);
 
-bool LSInsertar(struct Problema&, struct Solucion&, struct Solucion &, int);
+double hallarCarga_Ruta(vector<struct Cliente> &,const vector<int>);
 
-void imprimirCasos(struct vector<int>& ruta);
+double hallarTiempoTotal_Ruta(vector<vector<double>> &,vector<struct Cliente> &,
+                              const vector<int>);
 
-bool LSIntercambiar(struct Problema&, struct Solucion&, struct Solucion &, int);
+double hallarDistancia_Ruta(vector<vector<double>> &,const vector<int>);
 
-bool LSRealocar(struct Problema&, struct Solucion&, struct Solucion &, int);
+double hallarTiempoPorServicio_Ruta(vector<struct Cliente> &,const vector<int>);
 
-void TInsertar(struct Problema &, struct Solucion&, int);
-
-void TInsertarVehiculo(vector <vector <double>>&, struct Vehiculo &, int);
-
-int compararFitness(struct Solucion& solucion1, struct Solucion& solucion2);
-
-double hallarFitness1(struct Problema &problemita,vector<struct Vehiculo> &solucion);
-
-double hallarTiempoRuta(vector<vector<double>> &distancias, 
-        vector<struct Cliente> &clientes, const vector<int> ruta);
-
-double hallarDistanciaRuta(vector<vector<double>> &distancias, const vector<int> ruta);
-
-double hallarTiempoPorClienteRuta(vector<struct Cliente> &clientes, const vector<int> ruta);
-
-void shaking(Solucion &solucion, int k, Problema &problemita);
-
-bool posibleSolucion(const struct Solucion &solucion);
-
-double hallarCargaTotalRuta(vector<struct Cliente> &clientes, const vector<int> ruta);
-
-void TRealocar(struct Problema& problemita, struct Solucion& solucion, int lClientes);
-
-void TRealocarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
-        struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes);
-
-void TIntercambiar(struct Problema& problemita, struct Solucion& solucion, int lClientes);
-
-void TIntercambiarVehiculo(vector <vector <double>>& distancias, vector<struct Cliente> &clientes, 
-        struct Vehiculo &vehiculo1, struct Vehiculo& vehiculo2, int lClientes);
-
-void cambiarVecindario(struct Problema &problemita,
-        struct Solucion &solPropuesta, struct Solucion &solLocalMejorada, 
-        struct Solucion &mejorSolucion, int &k, int &t, int mejorT);
-
-
+int compararFitness(struct Solucion &,struct Solucion &);
 
 #endif /* RESOLUCION_H */

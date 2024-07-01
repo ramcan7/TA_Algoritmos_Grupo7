@@ -23,7 +23,11 @@ void cargarClientes(vector<struct Cliente> &,const char *);
 
 void cargarVehiculos(vector <struct Vehiculo> &);
 
-void imprimirSolucion(struct Problema& problemita, struct Solucion& solucion, const char *, int);
+void imprimirSolucion(struct Problema &,struct Solucion &,const char *);
+
+void imprimirRuta(ofstream &,struct Problema &,struct Vehiculo &);
+
+void imprimirEstadisticasDeRuta(ofstream &,struct Problema &,struct Vehiculo &);
 
 ifstream abrirArchivo_IFS(const char *);
 

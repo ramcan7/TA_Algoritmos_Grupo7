@@ -8,10 +8,10 @@
 #define SOLUCION_H
 #include "Vehiculo.h"
 
+// Definicion de 'Solucion'
 struct Solucion{
-    vector<struct Vehiculo> vehiculos;
-    double fitness;
+    vector<struct Vehiculo> vehiculos;  // 'Vehiculos' de la 'Solucion'
+    double fitness;                     // Punto de Comparacion entre Soluciones [En este caso, el menor fitness es el mejor]
 };
 
 #endif /* SOLUCION_H */
-
